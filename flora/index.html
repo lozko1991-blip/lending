@@ -252,6 +252,8 @@
     /* HEADER */
     @media (max-width: 768px) {
       .nav-links { display: none !important; }
+      .mobile-menu-btn { display: block !important; }
+      .header-cta { display: none !important; }
       .header-inner { justify-content: space-between !important; padding: 12px 16px !important; }
       .contact-grid { grid-template-columns: 1fr !important; gap: 32px !important; text-align: center !important; }
       .contact-info { margin: 0 auto !important; }
@@ -588,6 +590,20 @@
   </section>
 
   
+    <!-- MOBILE NAV DRAWER OVERLAY -->
+  <div id="mobileNavDrawer" style="display: none; position: fixed; inset: 0; background: rgba(253, 250, 246, 0.98); backdrop-filter: blur(12px); z-index: 9998; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; transition: all 0.3s ease;">
+    <button onclick="toggleMobileMenu()" style="position: absolute; top: 20px; right: 24px; font-size: 2.2rem; background: none; border: none; cursor: pointer; color: var(--rose-dark);">&times;</button>
+    <div style="font-family: var(--font-heading); font-size: 2rem; color: var(--rose-dark); margin-bottom: 30px;">Karinka <span style="font-family: var(--font-serif); font-style: italic;">Flowers</span></div>
+    <div style="display: flex; flex-direction: column; gap: 20px; text-align: center; width: 100%; max-width: 320px;">
+      <a href="#about" onclick="navigateToSection('about')" style="font-family: var(--font-heading); font-size: 1.3rem; color: var(--text-main); text-decoration: none; font-weight: 500; padding: 12px; border-bottom: 1px solid var(--rose-light);">🌸 Про мене</a>
+      <a href="#services" onclick="navigateToSection('services')" style="font-family: var(--font-heading); font-size: 1.3rem; color: var(--text-main); text-decoration: none; font-weight: 500; padding: 12px; border-bottom: 1px solid var(--rose-light);">💐 Послуги та Ціни</a>
+      <a href="#portfolio" onclick="navigateToSection('portfolio')" style="font-family: var(--font-heading); font-size: 1.3rem; color: var(--text-main); text-decoration: none; font-weight: 500; padding: 12px; border-bottom: 1px solid var(--rose-light);">🖼 Портфоліо</a>
+      <a href="#reviews" onclick="navigateToSection('reviews')" style="font-family: var(--font-heading); font-size: 1.3rem; color: var(--text-main); text-decoration: none; font-weight: 500; padding: 12px; border-bottom: 1px solid var(--rose-light);">💬 Відгуки</a>
+      <a href="#contact" onclick="navigateToSection('contact')" style="font-family: var(--font-heading); font-size: 1.3rem; color: var(--rose-dark); text-decoration: none; font-weight: 600; padding: 12px; border-bottom: 1px solid var(--rose-light);">📞 Контакти & Форма</a>
+    </div>
+    <button class="btn btn-primary" style="margin-top: 32px; width: 100%; max-width: 280px;" onclick="navigateToSection('contact')">Залишити заявку 🌸</button>
+  </div>
+
   <!-- SUCCESS CONFIRMATION MODAL (HIDDEN BY DEFAULT) -->
   <div id="successModal" onclick="closeSuccessModal(event)" style="display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(8px); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
     <div style="background: #FFFFFF; width: 100%; max-width: 440px; border-radius: 24px; padding: 40px; position: relative; text-align: center; box-shadow: 0 25px 70px rgba(0,0,0,0.3); border: 1px solid #F4D8E1;" onclick="event.stopPropagation()">
@@ -773,6 +789,27 @@
       if (document.getElementById('mainContactForm')) {
         document.getElementById('mainContactForm').reset();
       }
+    }
+
+    function toggleMobileMenu() {
+      const drawer = document.getElementById('mobileNavDrawer');
+      if (drawer) {
+        if (drawer.style.display === 'none' || drawer.style.display === '') {
+          drawer.style.display = 'flex';
+          document.body.style.overflow = 'hidden';
+        } else {
+          drawer.style.display = 'none';
+          document.body.style.overflow = 'auto';
+        }
+      }
+    }
+
+    function navigateToSection(sectionId) {
+      toggleMobileMenu();
+      setTimeout(() => {
+        const sec = document.getElementById(sectionId);
+        if (sec) sec.scrollIntoView({ behavior: 'smooth' });
+      }, 200);
     }
 
     function toggleSpeedDial() {
