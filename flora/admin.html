@@ -237,6 +237,12 @@
         <label class="form-label">Текст "Про мене"</label>
         <textarea id="cfgAboutLead" class="form-textarea" rows="3"></textarea>
       </div>
+
+      <div class="form-group">
+        <label class="form-label">Цитата "Про мене"</label>
+        <textarea id="cfgAboutQuote" class="form-textarea" rows="2"></textarea>
+      </div>
+
     </div>
 
     <div style="margin-top: 30px; display: flex; justify-content: flex-end; gap: 16px; border-top: 1px solid var(--rose-light); padding-top: 20px;">
@@ -314,6 +320,7 @@
       document.getElementById('cfgHeroSubtitle').value = siteConfig.heroSubtitle || '';
       document.getElementById('cfgAboutTitle').value = siteConfig.aboutTitle || '';
       document.getElementById('cfgAboutLead').value = siteConfig.aboutLead || '';
+      document.getElementById('cfgAboutQuote').value = siteConfig.aboutQuote || '';
       document.getElementById('cfgHeroPhoto').value = siteConfig.heroPhoto || '';
       document.getElementById('cfgAboutPhoto').value = siteConfig.aboutPhoto || '';
 
@@ -392,6 +399,7 @@
       siteConfig.heroSubtitle = document.getElementById('cfgHeroSubtitle').value.trim();
       siteConfig.aboutTitle = document.getElementById('cfgAboutTitle').value.trim();
       siteConfig.aboutLead = document.getElementById('cfgAboutLead').value.trim();
+      siteConfig.aboutQuote = document.getElementById('cfgAboutQuote').value.trim();
       siteConfig.heroPhoto = document.getElementById('cfgHeroPhoto').value.trim();
       siteConfig.aboutPhoto = document.getElementById('cfgAboutPhoto').value.trim();
 
