@@ -581,16 +581,16 @@
   </section>
 
   
-  <!-- SUCCESS CONFIRMATION MODAL -->
-  <div class="modal" id="successModal" onclick="closeSuccessModal(event)">
-    <div class="modal-content-card" onclick="event.stopPropagation()" style="text-align: center; max-width: 440px;">
-      <button class="modal-close-btn" onclick="closeSuccessModal()">&times;</button>
+  <!-- SUCCESS CONFIRMATION MODAL (HIDDEN BY DEFAULT) -->
+  <div id="successModal" onclick="closeSuccessModal(event)" style="display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(8px); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
+    <div style="background: #FFFFFF; width: 100%; max-width: 440px; border-radius: 24px; padding: 40px; position: relative; text-align: center; box-shadow: 0 25px 70px rgba(0,0,0,0.3); border: 1px solid #F4D8E1;" onclick="event.stopPropagation()">
+      <button onclick="closeSuccessModal()" style="position: absolute; top: 18px; right: 20px; font-size: 1.8rem; background: none; border: none; cursor: pointer; color: #8C787C;">&times;</button>
       <div style="font-size: 3.5rem; margin-bottom: 10px;">🌸</div>
-      <h3 class="font-serif" style="font-size: 2.2rem; margin-bottom: 10px; color: var(--rose-dark);" id="successModalTitle">Заявку прийнято!</h3>
-      <p style="font-size: 1rem; color: var(--text-body); margin-bottom: 24px; line-height: 1.6;" id="successModalText">
+      <h3 style="font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; margin-bottom: 10px; color: #8F2D46;" id="successModalTitle">Заявку прийнято!</h3>
+      <p style="font-size: 1rem; color: #59474B; margin-bottom: 24px; line-height: 1.6;" id="successModalText">
         Дякуємо! Вашу заявку успішно надіслано. Карінка зв'яжеться з вами протягом 15 хвилин для узгодження всіх деталей!
       </p>
-      <button class="btn btn-primary" style="width: 100%;" onclick="closeSuccessModal()">Чудово! ✨</button>
+      <button class="btn btn-primary" style="width: 100%; background: linear-gradient(135deg, #C25975 0%, #8F2D46 100%); color: #FFFFFF; border-radius: 50px; padding: 14px 28px; font-weight: 600; border: none; cursor: pointer;" onclick="closeSuccessModal()">Чудово! ✨</button>
     </div>
   </div>
 
@@ -729,13 +729,13 @@
       if (titleElem) titleElem.innerText = `Дякуємо, ${clientName || ''}! 🌸`;
       if (textElem) textElem.innerText = `Вашу заявку успішно прийнято! Карінка зв'яжеться з вами протягом 15 хвилин для узгодження всіх деталей замовлення.`;
       const modal = document.getElementById('successModal');
-      if (modal) modal.classList.add('active');
+      if (modal) modal.style.display = 'flex';
     }
 
     function closeSuccessModal(e) {
       if (!e || e.target.id === 'successModal' || e.target.tagName === 'BUTTON') {
         const modal = document.getElementById('successModal');
-        if (modal) modal.classList.remove('active');
+        if (modal) modal.style.display = 'none';
       }
     }
 
