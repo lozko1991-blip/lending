@@ -3,15 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Karina Floristry — Авторські Майстер-Класи з Флористики, Весільний Декор та WOW-Букети | Київ</title>
+  <link rel="icon" type="image/jpeg" href="favicon.jpg">
+  <title>Karina Flowers — Авторські Майстер-Класи з Флористики, Весільний Декор та WOW-Букети | Київ</title>
   <meta name="description" content="Авторська флористика від Карінки в Києві. Виїзні майстер-класи для дітей та дорослих, B2B навчання персоналу квіткових магазинів від 2000 грн, весільний декор від 5000 грн, WOW-букети від 1000 троянд. ☎ +38 (097) 123-45-67">
   <meta name="keywords" content="майстер класи з флористики, весільний декор Київ, навчання флористів, букет з 1000 троянд, флорист Київ, Карінка флористика">
   <meta name="robots" content="index, follow">
-  <meta name="author" content="Karina Floristry">
+  <meta name="author" content="Karina Flowers">
 
   <!-- OpenGraph Social Tags -->
-  <meta property="og:site_name" content="Karina Floristry">
-  <meta property="og:title" content="Karina Floristry — Авторські Майстер-Класи та Весільна Флористика">
+  <meta property="og:site_name" content="Karina Flowers">
+  <meta property="og:title" content="Karina Flowers — Авторські Майстер-Класи та Весільна Флористика">
   <meta property="og:description" content="Виїзні майстер-класи з флористики, B2B навчання для магазинів від 2000 грн, весільний декор від 5000 грн та WOW-букети від 1000 троянд.">
   <meta property="og:type" content="website">
 
@@ -531,6 +532,109 @@
     .form-input, .form-select, .form-textarea { width: 100%; padding: 16px; border: 1px solid var(--rose-light); border-radius: var(--radius-sm); }
 
     footer { background: var(--text-main); color: var(--rose-light); padding: 48px 0; text-align: center; }
+
+    /* SCROLL ANIMATIONS */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    header.scrolled {
+      box-shadow: 0 4px 25px rgba(46, 31, 35, 0.08);
+      background: rgba(250, 246, 243, 0.98);
+    }
+
+    /* ADVANTAGES SECTION */
+    .advantages-section { background: var(--bg-ivory); }
+    .adv-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 30px; }
+    .adv-card {
+      background: #FFFFFF;
+      padding: 40px 24px;
+      border-radius: var(--radius-md);
+      text-align: center;
+      border: 1px solid transparent;
+      transition: var(--transition);
+      box-shadow: var(--shadow-card);
+    }
+    .adv-card:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-hover);
+      border-color: var(--rose-light);
+    }
+    .adv-icon {
+      width: 64px;
+      height: 64px;
+      background: var(--bg-blush);
+      color: var(--rose-dark);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      margin: 0 auto 20px;
+      transition: var(--transition);
+    }
+    .adv-card:hover .adv-icon {
+      background: var(--rose-deep);
+      color: #FFFFFF;
+    }
+    .adv-title { font-size: 1.4rem; margin-bottom: 12px; }
+    .adv-text { color: var(--text-muted); font-size: 0.95rem; }
+
+    /* FAQ SECTION */
+    .faq-section { background: var(--bg-warm); }
+    .faq-container { max-width: 800px; margin: 0 auto; }
+    .faq-item {
+      background: #FFFFFF;
+      border-radius: var(--radius-sm);
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-card);
+      overflow: hidden;
+      transition: var(--transition);
+      border: 1px solid transparent;
+    }
+    .faq-item:hover { border-color: var(--rose-light); }
+    .faq-question {
+      width: 100%;
+      padding: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: none;
+      border: none;
+      font-family: var(--font-heading);
+      font-size: 1.3rem;
+      color: var(--text-main);
+      cursor: pointer;
+      text-align: left;
+    }
+    .faq-icon {
+      font-size: 1.2rem;
+      color: var(--rose-deep);
+      transition: transform 0.3s ease;
+    }
+    .faq-answer {
+      max-height: 0;
+      padding: 0 24px;
+      opacity: 0;
+      overflow: hidden;
+      color: var(--text-muted);
+      transition: all 0.4s ease;
+    }
+    .faq-item.active .faq-answer {
+      max-height: 500px;
+      padding: 0 24px 24px;
+      opacity: 1;
+    }
+    .faq-item.active .faq-icon {
+      transform: rotate(45deg);
+    }
+
 </style>
 </head>
 <body>
@@ -617,7 +721,7 @@
   <!-- SERVICES SECTION (CENTERED FLEXBOX) -->
   <section class="section services-section" id="services">
     <div class="container">
-      <div class="section-header">
+      <div class="section-header reveal">
         <div class="section-subtitle-tag">Мої послуги</div>
         <h2 class="section-title">Що я пропоную для вас</h2>
         <p class="section-description">Обирайте формат, який ідеально підходить під вашу подію або бізнес</p>
@@ -632,7 +736,7 @@
   <!-- PORTFOLIO & GALLERY SECTION (ALL 11 PHOTOS) -->
   <section class="section portfolio-section" id="portfolio">
     <div class="container">
-      <div class="section-header">
+      <div class="section-header reveal">
         <div class="section-subtitle-tag">Портфоліо</div>
         <h2 class="section-title">Галерея авторських робіт</h2>
         <p class="section-description">Оцініть живі моменти наших майстер-класів, весільного декору та букетів</p>
@@ -683,6 +787,60 @@
     </div>
   </div>
 
+  
+  <!-- FAQ SECTION -->
+  <section class="section faq-section" id="faq">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="section-subtitle-tag">FAQ</div>
+        <h2 class="section-title">Поширені запитання</h2>
+        <p class="section-description">Відповіді на найчастіші питання наших клієнтів</p>
+      </div>
+      
+      <div class="faq-container">
+        <div class="faq-item reveal">
+          <button class="faq-question" onclick="toggleFAQ(this)">
+            За скільки часу потрібно замовляти весільний декор?
+            <span class="faq-icon">＋</span>
+          </button>
+          <div class="faq-answer">
+            <p>Бажано бронювати дату щонайменше за місяць, щоб ми встигли розробити концепцію, підібрати матеріали та замовити ексклюзивні квіти. Проте, якщо у вас обмаль часу, звертайтеся — ми спробуємо знайти рішення!</p>
+          </div>
+        </div>
+        
+        <div class="faq-item reveal">
+          <button class="faq-question" onclick="toggleFAQ(this)">
+            Чи проводите ви майстер-класи для новачків?
+            <span class="faq-icon">＋</span>
+          </button>
+          <div class="faq-answer">
+            <p>Так! Наші виїзні майстер-класи розраховані як на дорослих, так і на дітей без жодного досвіду. Ми покроково пояснюємо всі техніки та допомагаємо створити власний шедевр.</p>
+          </div>
+        </div>
+        
+        <div class="faq-item reveal">
+          <button class="faq-question" onclick="toggleFAQ(this)">
+            Як довго стоїть букет?
+            <span class="faq-icon">＋</span>
+          </button>
+          <div class="faq-answer">
+            <p>При правильному догляді наші букети зберігають свіжість від 7 до 14 днів, залежно від сортів квітів. Ми завжди додаємо інструкцію з догляду та спеціальне підживлення для води.</p>
+          </div>
+        </div>
+
+        <div class="faq-item reveal">
+          <button class="faq-question" onclick="toggleFAQ(this)">
+            Чи є у вас доставка?
+            <span class="faq-icon">＋</span>
+          </button>
+          <div class="faq-answer">
+            <p>Так, ми пропонуємо дбайливу адресну доставку по місту. Усі композиції транспортуються у спеціальних боксах із водою (аквабоксах), щоб вони не втрачали свіжості під час дороги.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- CONTACT SECTION -->
   <section class="section contact-section" id="contact">
     <div class="container contact-grid">
@@ -692,7 +850,7 @@
         <p><strong>Телефон:</strong> <a href="tel:+380971234567" id="displayPhoneLink">+38 (097) 123-45-67</a></p>
         <p><strong>Email:</strong> <span id="displayEmailText">karina.flowers@gmail.com</span></p>
       </div>
-      <div class="contact-form-card">
+      <div class="contact-form-card reveal">
         <h3>Залишити заявку</h3>
         <form onsubmit="event.preventDefault(); alert('Дякуємо! Заявку прийнято.');">
           <div class="form-group"><input type="text" placeholder="Ваше ім'я" class="form-input" required></div>
@@ -705,7 +863,7 @@
 
   <footer>
     <div class="container">
-      <p>© 2026 Karina Floristry. Авторська флористика.</p>
+      <p>© 2026 Karina Flowers. Авторська флористика.</p>
       <a href="admin.html" style="color: var(--text-light); font-size: 0.8rem;">⚙️ Вхід в Адмінку</a>
     </div>
   </footer>
@@ -789,9 +947,61 @@
       const vbW = document.getElementById('viberWidgetLink');
       if (vbW) vbW.style.display = 'none';
 
+      // Apply dynamic texts
+      const displayHeroTitle = document.getElementById('displayHeroTitle');
+      if (displayHeroTitle && siteConfig.heroTitle) displayHeroTitle.innerHTML = siteConfig.heroTitle;
+      
+      const displayHeroSubtitle = document.getElementById('displayHeroSubtitle');
+      if (displayHeroSubtitle && siteConfig.heroSubtitle) displayHeroSubtitle.innerText = siteConfig.heroSubtitle;
+      
+      const displayAboutTitle = document.getElementById('displayAboutTitle');
+      if (displayAboutTitle && siteConfig.aboutTitle) displayAboutTitle.innerHTML = siteConfig.aboutTitle;
+      
+      const displayAboutLead = document.getElementById('displayAboutLead');
+      if (displayAboutLead && siteConfig.aboutLead) displayAboutLead.innerText = siteConfig.aboutLead;
+      
+      const displayEmailText = document.getElementById('displayEmailText');
+      if (displayEmailText && siteConfig.email) displayEmailText.innerText = siteConfig.email;
+      
+      // Apply dynamic photos
+      const heroMainPhoto = document.getElementById('heroMainPhoto');
+      if (heroMainPhoto && siteConfig.heroPhoto) heroMainPhoto.src = siteConfig.heroPhoto;
+      
+      const aboutPhoto = document.getElementById('aboutPhoto');
+      if (aboutPhoto && siteConfig.aboutPhoto) aboutPhoto.src = siteConfig.aboutPhoto;
+
+      // Apply Font Family
+      if (siteConfig.fontFamily) {
+        document.documentElement.style.setProperty('--font-heading', siteConfig.fontFamily);
+      }
+
       renderServicesCatalog();
-        renderPortfolioGallery();
+      renderPortfolioGallery();
       renderGalleryAndAlbums();
+    }
+
+    async function sendTelegramMessage(text) {
+      if (!siteConfig.telegramToken || !siteConfig.telegramChatId) {
+        console.warn('Telegram token or chat ID is missing. Cannot send message.');
+        return;
+      }
+      try {
+        const url = `https://api.telegram.org/bot${siteConfig.telegramToken}/sendMessage`;
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: siteConfig.telegramChatId,
+            text: text,
+            parse_mode: 'HTML'
+          })
+        });
+        if (!response.ok) {
+            console.error('Telegram API error:', await response.text());
+        }
+      } catch (e) {
+        console.error('Error sending telegram message', e);
+      }
     }
 
     
@@ -1145,5 +1355,41 @@
 
     document.addEventListener('DOMContentLoaded', () => { loadSiteConfig(); });
   </script>
+
+  <script>
+    // Scroll Animations & Header Shadow
+    document.addEventListener('DOMContentLoaded', () => {
+      const header = document.querySelector('header');
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 50) {
+          header.classList.add('scrolled');
+        } else {
+          header.classList.remove('scrolled');
+        }
+      });
+
+      const reveals = document.querySelectorAll('.reveal');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('active');
+            observer.unobserve(entry.target); // play once
+          }
+        });
+      }, { threshold: 0.05, rootMargin: "0px 0px -30px 0px" });
+
+      reveals.forEach(reveal => observer.observe(reveal));
+      
+      // Observe dynamically injected elements later by exposing observer globally
+      window.appScrollObserver = observer;
+    });
+
+    // FAQ Accordion
+    function toggleFAQ(button) {
+      const item = button.parentElement;
+      item.classList.toggle('active');
+    }
+  </script>
+
 </body>
 </html>
