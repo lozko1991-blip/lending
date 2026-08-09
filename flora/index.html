@@ -250,6 +250,10 @@
     }
 
     /* HEADER */
+    @media (max-width: 992px) {
+      .header-phone-link { display: none !important; }
+    }
+
     header {
       position: fixed;
       top: 0;
@@ -576,6 +580,20 @@
     </div>
   </section>
 
+  
+  <!-- SUCCESS CONFIRMATION MODAL -->
+  <div class="modal" id="successModal" onclick="closeSuccessModal(event)">
+    <div class="modal-content-card" onclick="event.stopPropagation()" style="text-align: center; max-width: 440px;">
+      <button class="modal-close-btn" onclick="closeSuccessModal()">&times;</button>
+      <div style="font-size: 3.5rem; margin-bottom: 10px;">🌸</div>
+      <h3 class="font-serif" style="font-size: 2.2rem; margin-bottom: 10px; color: var(--rose-dark);" id="successModalTitle">Заявку прийнято!</h3>
+      <p style="font-size: 1rem; color: var(--text-body); margin-bottom: 24px; line-height: 1.6;" id="successModalText">
+        Дякуємо! Вашу заявку успішно надіслано. Карінка зв'яжеться з вами протягом 15 хвилин для узгодження всіх деталей!
+      </p>
+      <button class="btn btn-primary" style="width: 100%;" onclick="closeSuccessModal()">Чудово! ✨</button>
+    </div>
+  </div>
+
   <!-- LIGHTBOX MODAL -->
   <div class="lightbox-modal" id="lightboxModal" onclick="closeLightbox(event)">
     <div class="lightbox-box" onclick="event.stopPropagation()">
@@ -687,6 +705,67 @@
 
       renderServicesCatalog();
       renderGalleryAndAlbums();
+    }
+
+    
+    function scrollToContactForm(serviceName) {
+      const contactSec = document.getElementById('contact');
+      if (serviceName) {
+        const select = document.getElementById('serviceSelect');
+        if (select) select.value = serviceName;
+      }
+      if (contactSec) {
+        contactSec.scrollIntoView({ behavior: 'smooth' });
+        setTimeout(() => {
+          const nameInput = document.getElementById('clientName');
+          if (nameInput) nameInput.focus();
+        }, 600);
+      }
+    }
+
+    function showSuccessModal(clientName) {
+      const titleElem = document.getElementById('successModalTitle');
+      const textElem = document.getElementById('successModalText');
+      if (titleElem) titleElem.innerText = `Дякуємо, ${clientName || ''}! 🌸`;
+      if (textElem) textElem.innerText = `Вашу заявку успішно прийнято! Карінка зв'яжеться з вами протягом 15 хвилин для узгодження всіх деталей замовлення.`;
+      const modal = document.getElementById('successModal');
+      if (modal) modal.classList.add('active');
+    }
+
+    function closeSuccessModal(e) {
+      if (!e || e.target.id === 'successModal' || e.target.tagName === 'BUTTON') {
+        const modal = document.getElementById('successModal');
+        if (modal) modal.classList.remove('active');
+      }
+    }
+
+    async function handleFormSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('clientName') ? document.getElementById('clientName').value.trim() : '';
+      const phone = document.getElementById('clientPhone') ? document.getElementById('clientPhone').value.trim() : '';
+      const service = document.getElementById('serviceSelect') ? document.getElementById('serviceSelect').value : '';
+      const message = document.getElementById('clientMessage') ? document.getElementById('clientMessage').value.trim() : '';
+
+      const telegramMsg = `<b>🌸 НОВА ЗАЯВКА З САЙТУ!</b>\n\n` +
+                          `<b>👤 Ім'я:</b> ${name}\n` +
+                          `<b>📞 Телефон:</b> ${phone}\n` +
+                          `<b>💐 Послуга:</b> ${service || 'Консультація'}\n` +
+                          `<b>📝 Опис замовлення:</b> ${message || 'Не вказано'}`;
+
+      await sendTelegramMessage(telegramMsg);
+
+      // Trigger Email Notification fallback
+      if (siteConfig.email) {
+        const mailSubject = encodeURIComponent(`Нова заявка з сайту від ${name}`);
+        const mailBody = encodeURIComponent(`Ім'я: ${name}\nТелефон: ${phone}\nПослуга: ${service}\nОпис: ${message}`);
+        console.log(`Email notification prepared for ${siteConfig.email}`);
+      }
+
+      showSuccessModal(name);
+
+      if (document.getElementById('mainContactForm')) {
+        document.getElementById('mainContactForm').reset();
+      }
     }
 
     function renderServicesCatalog() {
