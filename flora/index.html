@@ -250,6 +250,13 @@
     }
 
     /* HEADER */
+    @media (max-width: 768px) {
+      .nav-links { display: none !important; }
+      .header-inner { justify-content: space-between !important; padding: 12px 16px !important; }
+      .contact-grid { grid-template-columns: 1fr !important; gap: 32px !important; text-align: center !important; }
+      .contact-info { margin: 0 auto !important; }
+      .contact-card { width: 100% !important; margin: 0 auto !important; }
+    }
     @media (max-width: 992px) {
       .header-phone-link { display: none !important; }
     }
@@ -767,6 +774,25 @@
         document.getElementById('mainContactForm').reset();
       }
     }
+
+    function toggleSpeedDial() {
+      const menu = document.getElementById('speedDialMenu');
+      if (menu) {
+        if (menu.style.display === 'none' || menu.style.display === '') {
+          menu.style.display = 'flex';
+        } else {
+          menu.style.display = 'none';
+        }
+      }
+    }
+
+    document.addEventListener('click', function(e) {
+      const dialContainer = document.getElementById('speedDialMenu');
+      const toggleBtn = document.getElementById('callFloatingBtn');
+      if (dialContainer && toggleBtn && !dialContainer.contains(e.target) && !toggleBtn.contains(e.target)) {
+        dialContainer.style.display = 'none';
+      }
+    });
 
     function renderServicesCatalog() {
       const grid = document.getElementById('dynamicServicesGrid');
