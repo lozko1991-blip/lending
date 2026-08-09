@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🚀 Multi-Landing Hub — Каталог Сайтів</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0F172A;
+      --card-bg: #1E293B;
+      --primary: #38BDF8;
+      --accent: #F43F5E;
+      --text: #F8FAFC;
+      --muted: #94A3B8;
+      --radius: 16px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 60px 20px;
+      min-height: 100vh;
+    }
+    .container { max-width: 1000px; margin: 0 auto; }
+    .header { text-align: center; margin-bottom: 50px; }
+    .header h1 { font-size: 3rem; margin-bottom: 12px; }
+    .header p { color: var(--muted); font-size: 1.1rem; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; }
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 32px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .card:hover { transform: translateY(-6px); border-color: var(--primary); }
+    .card-tag { display: inline-block; background: rgba(244, 63, 94, 0.15); color: var(--accent); font-size: 0.8rem; font-weight: 700; padding: 4px 12px; border-radius: 50px; margin-bottom: 16px; }
+    .card-title { font-size: 1.8rem; margin-bottom: 12px; color: #FFFFFF; }
+    .card-desc { color: var(--muted); font-size: 0.95rem; margin-bottom: 24px; line-height: 1.6; }
+    .card-actions { display: flex; gap: 12px; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; padding: 12px 20px; border-radius: 50px; text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: all 0.3s ease; }
+    .btn-primary { background: var(--primary); color: #0F172A; }
+    .btn-primary:hover { opacity: 0.9; }
+    .btn-outline { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: var(--text); }
+    .btn-outline:hover { background: rgba(255,255,255,0.1); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🚀 Landing Pages Hub</h1>
+      <p>Каталог авторських односторінкових сайтів та лендінгів</p>
+    </div>
+
+    <div class="grid">
+      <!-- FLORA LANDING CARD -->
+      <div class="card">
+        <div>
+          <span class="card-tag">🌸 Флористика & МК</span>
+          <h2 class="card-title">Karina Floristry</h2>
+          <p class="card-desc">
+            Авторські виїзні майстер-класи з флористики для дітей та дорослих, B2B навчання персоналу квіткових магазинів від 2000 грн, весільний декор та WOW-букети.
+          </p>
+        </div>
+        <div class="card-actions">
+          <a href="flora/" class="btn btn-primary">🌐 Відкрити сайт</a>
+          <a href="flora/admin.html" class="btn btn-outline">⚙️ Адмінка</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
