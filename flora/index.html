@@ -526,7 +526,24 @@
     .form-input, .form-select, .form-textarea { width: 100%; padding: 16px; border: 1px solid var(--rose-light); border-radius: var(--radius-sm); }
 
     footer { background: var(--text-main); color: var(--rose-light); padding: 48px 0; text-align: center; }
-  </style>
+  /* SMARTPHONE MOBILE NAVIGATION & LAYOUT (<768px) */
+  @media (max-width: 768px) {
+    .nav-links { display: none !important; }
+    .header-phone-link { display: none !important; }
+    .mobile-menu-btn { display: inline-block !important; }
+    .header-cta { display: none !important; }
+    
+    .portfolio-grid {
+      display: grid !important;
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 10px !important;
+    }
+    .portfolio-item img {
+      height: 170px !important;
+      object-fit: cover !important;
+    }
+  }
+</style>
 </head>
 <body>
 
@@ -534,15 +551,9 @@
   <a href="tel:+380971234567" class="mobile-call-pulse-btn" id="mobileCallBtn">📞</a>
 
   <!-- Floating Telegram & Viber Widgets -->
-  <a href="viber://chat?number=%2B380971234567" class="floating-widget viber-widget" id="viberWidgetLink" title="Написати у Viber">
-    <div class="widget-icon" style="background: #7360F2;">🟣</div>
-    <div class="widget-text">Написати у Viber</div>
-  </a>
+  
 
-  <a href="https://t.me/karinka_flowers" target="_blank" class="floating-widget" id="telegramWidgetLink" title="Написати в Telegram">
-    <div class="widget-icon">✈</div>
-    <div class="widget-text">Написати Карінці</div>
-  </a>
+  
 
   <!-- HEADER -->
   <header>
