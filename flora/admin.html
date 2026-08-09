@@ -84,6 +84,54 @@
     .tab-content.active { display: block; }
     .card-item { background: var(--bg-ivory); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--rose-light); margin-bottom: 16px; }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  /* MOBILE SMARTPHONE RESPONSIVE STYLES (<768px) */
+    @media (max-width: 768px) {
+      .admin-container { padding: 12px !important; }
+      .admin-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+        padding: 16px !important;
+      }
+      .admin-tabs {
+        display: flex !important;
+        overflow-x: auto !important;
+        flex-wrap: nowrap !important;
+        white-space: nowrap !important;
+        -webkit-overflow-scrolling: touch !important;
+        padding-bottom: 8px !important;
+        gap: 8px !important;
+        border-bottom: 2px solid var(--rose-light) !important;
+      }
+      .tab-btn {
+        flex: 0 0 auto !important;
+        padding: 10px 16px !important;
+        font-size: 0.9rem !important;
+      }
+      .form-grid {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+      }
+      .admin-card {
+        padding: 18px !important;
+        border-radius: 16px !important;
+      }
+      .service-card-editor, .photo-card-editor {
+        padding: 16px !important;
+        border-radius: 16px !important;
+      }
+      .btn {
+        width: 100% !important;
+        margin-bottom: 8px !important;
+        min-height: 46px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+      }
+      input[type="text"], input[type="tel"], input[type="password"], input[type="email"], textarea, select {
+        font-size: 16px !important; /* Prevents auto-zoom on iOS safari */
+      }
+    }
   </style>
 </head>
 <body>
