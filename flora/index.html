@@ -304,6 +304,14 @@
       .floating-widget {
         bottom: 30px;
       }
+      .floating-widget.viber-widget {
+        bottom: 90px;
+      }
+    }
+    @media (max-width: 768px) {
+      .floating-widget.viber-widget {
+        bottom: 160px;
+      }
     }
 
     .widget-icon {
@@ -1364,7 +1372,11 @@
     📞
   </a>
 
-  <!-- Floating Telegram Widget -->
+  <!-- Floating Telegram & Viber Widgets -->
+  <a href="viber://chat?number=%2B380971234567" class="floating-widget viber-widget" id="viberWidgetLink" title="Написати у Viber">
+    <div class="widget-icon" style="background: #7360F2;">🟣</div>
+    <div class="widget-text">Написати у Viber</div>
+  </a>
   <a href="https://t.me/karinka_flowers" target="_blank" class="floating-widget" id="telegramWidgetLink" title="Написати в Telegram">
     <div class="widget-icon">✈</div>
     <div class="widget-text">Написати Карінці</div>
@@ -1951,6 +1963,9 @@
 
     const DEFAULT_CONFIG = {
       telegramToken: '',
+      telegramUsername: 'karinka_flowers',
+      viberPhone: '+380971234567',
+      viberEnabled: true,
       telegramChatId: '',
       phone: '+38 (097) 123-45-67',
       email: 'karina.flowers@gmail.com',
@@ -2065,6 +2080,29 @@
       }
 
       // 6. Dynamic Script Execution for Google / FB Pixels
+      
+      // Telegram & Viber Link Generator
+      const tgUser = siteConfig.telegramUsername ? siteConfig.telegramUsername.replace(/^@/, '') : 'karinka_flowers';
+      let tgUrl = 'https://t.me/' + tgUser;
+      if (tgUser.startsWith('+') || /^[0-9]+$/.test(tgUser)) {
+        tgUrl = 'https://t.me/' + (tgUser.startsWith('+') ? tgUser : '+' + tgUser);
+      }
+      const tgWidget = document.getElementById('telegramWidgetLink');
+      if (tgWidget) tgWidget.href = tgUrl;
+
+      // Viber Floating Widget
+      const viberPhone = siteConfig.viberPhone || siteConfig.phone || '';
+      const cleanViber = viberPhone.replace(/[^0-9]/g, '');
+      const viberWidget = document.getElementById('viberWidgetLink');
+      if (viberWidget) {
+        if (siteConfig.viberEnabled !== false && cleanViber) {
+          viberWidget.style.display = 'flex';
+          viberWidget.href = 'viber://chat?number=%2B' + cleanViber;
+        } else {
+          viberWidget.style.display = 'none';
+        }
+      }
+
       const container = document.getElementById('dynamicMarketingHead');
       if (container) {
         container.innerHTML = '';

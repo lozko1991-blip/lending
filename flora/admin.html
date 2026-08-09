@@ -140,6 +140,22 @@
           <input type="text" id="cfgTelegramChatId" class="form-input">
         </div>
       </div>
+      
+      <h3 style="font-size: 1.4rem; margin-top: 20px; margin-bottom: 16px;">Месенджери (Telegram & Viber)</h3>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Нікнейм чи Номер Telegram (без @)</label>
+          <input type="text" id="cfgTelegramUsername" class="form-input" placeholder="karinka_flowers або +380931896270">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Номер телефону Viber</label>
+          <input type="text" id="cfgViberPhone" class="form-input" placeholder="+380931896270">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label"><input type="checkbox" id="cfgViberEnabled"> Показувати фіолетову кнопку Viber на сайті</label>
+      </div>
+
       <h3 style="font-size: 1.4rem; margin-top: 10px; margin-bottom: 16px;">Контакти на сайті</h3>
       <div class="grid-2">
         <div class="form-group">
@@ -234,6 +250,9 @@
 
     const DEFAULT_CONFIG = {
       telegramToken: '',
+      telegramUsername: 'karinka_flowers',
+      viberPhone: '+380971234567',
+      viberEnabled: true,
       telegramChatId: '',
       phone: '+38 (097) 123-45-67',
       email: 'karina.flowers@gmail.com',
@@ -285,6 +304,9 @@
       document.getElementById('cfgTelegramChatId').value = siteConfig.telegramChatId || '';
       document.getElementById('cfgPhone').value = siteConfig.phone || '';
       document.getElementById('cfgEmail').value = siteConfig.email || '';
+      document.getElementById('cfgTelegramUsername').value = siteConfig.telegramUsername || '';
+      document.getElementById('cfgViberPhone').value = siteConfig.viberPhone || '';
+      document.getElementById('cfgViberEnabled').checked = siteConfig.viberEnabled !== false;
       document.getElementById('cfgGoogleCode').value = siteConfig.googleCode || '';
       document.getElementById('cfgFacebookPixel').value = siteConfig.facebookPixel || '';
       document.getElementById('cfgFontFamily').value = siteConfig.fontFamily || "'Cormorant Garamond', serif";
@@ -363,6 +385,9 @@
       siteConfig.telegramChatId = document.getElementById('cfgTelegramChatId').value.trim();
       siteConfig.phone = document.getElementById('cfgPhone').value.trim();
       siteConfig.email = document.getElementById('cfgEmail').value.trim();
+      siteConfig.telegramUsername = document.getElementById('cfgTelegramUsername').value.trim();
+      siteConfig.viberPhone = document.getElementById('cfgViberPhone').value.trim();
+      siteConfig.viberEnabled = document.getElementById('cfgViberEnabled').checked;
       siteConfig.googleCode = document.getElementById('cfgGoogleCode').value.trim();
       siteConfig.facebookPixel = document.getElementById('cfgFacebookPixel').value.trim();
       siteConfig.fontFamily = document.getElementById('cfgFontFamily').value;
