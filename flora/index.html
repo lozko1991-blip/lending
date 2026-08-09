@@ -815,11 +815,54 @@
             <div class="service-price-wrap">
               <span class="service-price">${serv.price}</span>
             </div>
-            <button class="btn btn-primary" style="width:100%;" onclick="alert('Заявку на послугу прийнято!')">Замовити послугу</button>
+            <button class="btn btn-primary" style="width:100%;" onclick="openModal('${serv.title}')">Замовити послугу</button>
           </div>
         `;
         grid.appendChild(card);
       });
+    }
+
+    const orderModal = document.getElementById('orderModal');
+    const modalTitle = document.getElementById('modalTitle');
+
+    function openModal(serviceName) {
+      if (modalTitle) modalTitle.innerText = serviceName ? 'Замовити: ' + serviceName : 'Замовити консультацію';
+      if (orderModal) {
+        orderModal.style.display = 'flex';
+        orderModal.classList.add('active');
+      }
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal(e) {
+      if (!e || e.target.id === 'orderModal' || e.target.classList.contains('modal-close-btn')) {
+        if (orderModal) {
+          orderModal.style.display = 'none';
+          orderModal.classList.remove('active');
+        }
+        document.body.style.overflow = 'auto';
+      }
+    }
+
+    async function handleModalSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('modalName') ? document.getElementById('modalName').value.trim() : '';
+      const phone = document.getElementById('modalPhone') ? document.getElementById('modalPhone').value.trim() : '';
+      const titleText = modalTitle ? modalTitle.innerText : '';
+      const service = titleText.replace('Замовити: ', '');
+
+      const telegramMsg = `<b>🌸 НОВА ЗАЯВКА НА ПОСЛУГУ!</b>\n\n` +
+                          `<b>👤 Ім'я:</b> ${name}\n` +
+                          `<b>📞 Телефон:</b> ${phone}\n` +
+                          `<b>💐 Обрана послуга:</b> ${service}`;
+
+      await sendTelegramMessage(telegramMsg);
+
+      closeModal();
+      showSuccessModal(name);
+
+      if (document.getElementById('modalName')) document.getElementById('modalName').value = '';
+      if (document.getElementById('modalPhone')) document.getElementById('modalPhone').value = '';
     }
 
     function openServicePhotoLightbox(src, title) {
