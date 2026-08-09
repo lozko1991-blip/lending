@@ -2125,11 +2125,39 @@
       grid.innerHTML = '';
       if (select) select.innerHTML = '';
 
-      siteConfig.services.forEach(serv => {
+      siteConfig.services.forEach((serv, sIndex) => {
         const card = document.createElement('div');
         card.className = `service-card ${serv.highlight ? 'highlight' : ''}`;
 
         let sloganHtml = serv.slogan ? `<div class="service-slogan-box">${serv.slogan}</div>` : '';
+
+        // Find photos associated with this service/album
+        const targetAlbum = (serv.albumName || '').toLowerCase().trim();
+        let servicePhotos = (siteConfig.gallery || []).filter(item => {
+          if (serv.photos && serv.photos.length) return false;
+          if (!targetAlbum) return false;
+          const cat = (item.cat || '').toLowerCase().trim();
+          const alb = (item.albumName || '').toLowerCase().trim();
+          return alb.includes(targetAlbum) || cat.includes(targetAlbum) || (sIndex === 0 && (cat === 'mk' || alb.includes('майстер')));
+        });
+
+        if (serv.photos && serv.photos.length) {
+          servicePhotos = serv.photos.map(pUrl => ({ src: pUrl, title: serv.title }));
+        }
+
+        let miniGalleryHtml = '';
+        if (servicePhotos.length > 0) {
+          const previewPhotos = servicePhotos.slice(0, 4);
+          miniGalleryHtml = `<div class="service-mini-gallery" style="display:flex; gap:10px; margin: 18px 0; overflow-x:auto; padding-bottom:6px;">`;
+          previewPhotos.forEach((p, pIdx) => {
+            miniGalleryHtml += `
+              <div style="flex:0 0 76px; height:76px; border-radius:12px; overflow:hidden; border:1px solid var(--rose-light); cursor:pointer;" onclick="openServicePhotoLightbox('${p.src}', '${p.title}')">
+                <img src="${p.src}" style="width:100%; height:100%; object-fit:cover; transition:transform 0.3s ease;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+              </div>
+            `;
+          });
+          miniGalleryHtml += `</div>`;
+        }
 
         card.innerHTML = `
           <div>
@@ -2137,6 +2165,7 @@
             <h3 class="service-title font-serif">${serv.title}</h3>
             <p class="service-text">${serv.description}</p>
             ${sloganHtml}
+            ${miniGalleryHtml}
           </div>
           <div>
             <div class="service-price-wrap">
@@ -2157,107 +2186,16 @@
       });
     }
 
-    function renderGalleryAndAlbums() {
-      const grid = document.getElementById('galleryGrid');
-      const filterBox = document.getElementById('dynamicAlbumFilterBtns');
-      if (!grid || !filterBox) return;
-
-      grid.innerHTML = '';
-      filterBox.innerHTML = '';
-
-      // Find unique albums
-      const albumMap = { 'all': 'Всі фото (' + siteConfig.gallery.length + ')' };
-      siteConfig.gallery.forEach(item => {
-        const cat = item.cat || 'other';
-        const albumName = item.albumName || (cat === 'mk' ? 'Майстер-класи' : cat === 'wedding' ? 'Весільний декор' : 'Інше');
-        if (!albumMap[cat]) albumMap[cat] = albumName;
-      });
-
-      // Render Album Buttons
-      Object.keys(albumMap).forEach(catKey => {
-        const btn = document.createElement('button');
-        btn.className = `album-btn ${activeCategoryFilter === catKey ? 'active' : ''}`;
-        btn.innerText = albumMap[catKey];
-        btn.onclick = (e) => filterGallery(catKey, btn);
-        filterBox.appendChild(btn);
-      });
-
-      // Render Gallery Cards
-      siteConfig.gallery.forEach((item, index) => {
-        const catKey = item.cat || 'other';
-        if (activeCategoryFilter !== 'all' && activeCategoryFilter !== catKey) return;
-
-        const card = document.createElement('div');
-        card.className = 'gallery-card';
-        card.setAttribute('data-category', catKey);
-        card.onclick = () => openLightboxByIndex(index);
-
-        card.innerHTML = `
-          <div class="gallery-card-id">ID: photo-${index + 1}</div>
-          <img src="${item.src}" alt="${item.title}" id="gallery-img-${index + 1}">
-          <div class="gallery-card-overlay">
-            <div class="gallery-card-title">${item.title}</div>
-          </div>
-        `;
-        grid.appendChild(card);
-      });
-    }
-
-    function filterGallery(category, btn) {
-      activeCategoryFilter = category;
-      const btns = document.querySelectorAll('.album-btn');
-      btns.forEach(b => b.classList.remove('active'));
-      if(btn) btn.classList.add('active');
-      renderGalleryAndAlbums();
-    }
-
-    function toggleFaq(itemElem) {
-      const allItems = document.querySelectorAll('.faq-item');
-      allItems.forEach(item => {
-        if (item !== itemElem) item.classList.remove('active');
-      });
-      itemElem.classList.toggle('active');
-    }
-
-    function openLightboxByIndex(index) {
-      currentGalleryIndex = index;
-      updateLightboxView();
-      document.getElementById('lightboxModal').classList.add('active');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function updateLightboxView() {
-      const item = siteConfig.gallery[currentGalleryIndex];
-      if (!item) return;
-
+    function openServicePhotoLightbox(src, title) {
       const img = document.getElementById('lightboxImg');
       const caption = document.getElementById('lightboxCaption');
       const counter = document.getElementById('lightboxCounter');
 
-      img.style.opacity = '0.3';
-      setTimeout(() => {
-        img.src = item.src;
-        caption.innerText = item.title;
-        counter.innerText = `Фото ${currentGalleryIndex + 1} з ${siteConfig.gallery.length}`;
-        img.style.opacity = '1';
-      }, 120);
-    }
-
-    function prevLightboxImage() {
-      currentGalleryIndex = (currentGalleryIndex - 1 + siteConfig.gallery.length) % siteConfig.gallery.length;
-      updateLightboxView();
-    }
-
-    function nextLightboxImage() {
-      currentGalleryIndex = (currentGalleryIndex + 1) % siteConfig.gallery.length;
-      updateLightboxView();
-    }
-
-    function closeLightbox(e) {
-      if (!e || e.target.id === 'lightboxModal' || e.target.classList.contains('lightbox-close-btn')) {
-        document.getElementById('lightboxModal').classList.remove('active');
-        document.body.style.overflow = 'auto';
-      }
+      img.src = src;
+      caption.innerText = title || 'Фото послуги';
+      counter.innerText = 'Фото послуги';
+      document.getElementById('lightboxModal').classList.add('active');
+      document.body.style.overflow = 'hidden';
     }
 
     document.addEventListener('keydown', (e) => {

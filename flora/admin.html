@@ -330,54 +330,51 @@
 
     function renderServicesTab() {
       const container = document.getElementById('adminServicesContainer');
+      if (!container) return;
       container.innerHTML = '';
       siteConfig.services.forEach((serv, i) => {
         const card = document.createElement('div');
         card.className = 'card-item';
+        const albumNameVal = serv.albumName || (i===0 ? 'Майстер-класи' : i===1 ? 'B2B' : i===2 ? 'Весільний декор' : 'WOW-букети');
         card.innerHTML = `
-          <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
             <strong>Послуга #${i+1}: ${serv.title}</strong>
             <button class="btn btn-danger btn-sm" onclick="siteConfig.services.splice(${i},1); renderServicesTab();">Видалити</button>
           </div>
           <div class="grid-2">
-            <div class="form-group"><label class="form-label">Назва</label><input type="text" class="form-input" value="${serv.title}" onchange="siteConfig.services[${i}].title=this.value"></div>
+            <div class="form-group"><label class="form-label">Назва послуги</label><input type="text" class="form-input" value="${serv.title}" onchange="siteConfig.services[${i}].title=this.value"></div>
             <div class="form-group"><label class="form-label">Ціна</label><input type="text" class="form-input" value="${serv.price}" onchange="siteConfig.services[${i}].price=this.value"></div>
           </div>
-          <div class="form-group"><label class="form-label">Опис</label><textarea class="form-textarea" rows="2" onchange="siteConfig.services[${i}].description=this.value">${serv.description}</textarea></div>
-        `;
-        container.appendChild(card);
-      });
-    }
-
-    function addNewServicePrompt() {
-      siteConfig.services.push({ title: "Нова послуга", price: "від 1 000 грн", description: "Опис послуги...", highlight: false });
-      renderServicesTab();
-    }
-
-    function renderPhotosTab() {
-      const container = document.getElementById('adminGalleryContainer');
-      container.innerHTML = '';
-      siteConfig.gallery.forEach((item, i) => {
-        const card = document.createElement('div');
-        card.className = 'card-item';
-        card.innerHTML = `
-          <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-            <strong>Фото #${i+1}: ${item.title}</strong>
-            <button class="btn btn-danger btn-sm" onclick="siteConfig.gallery.splice(${i},1); renderPhotosTab();">Видалити</button>
-          </div>
+          <div class="form-group"><label class="form-label">Опис послуги</label><textarea class="form-textarea" rows="2" onchange="siteConfig.services[${i}].description=this.value">${serv.description}</textarea></div>
           <div class="grid-2">
-            <div class="form-group"><label class="form-label">Назва</label><input type="text" class="form-input" value="${item.title}" onchange="siteConfig.gallery[${i}].title=this.value"></div>
-            <div class="form-group"><label class="form-label">Шлях / URL</label><input type="text" class="form-input" value="${item.src}" onchange="siteConfig.gallery[${i}].src=this.value"></div>
+            <div class="form-group">
+              <label class="form-label">Прив'язаний фотоальбом (назва катег.)</label>
+              <input type="text" class="form-input" value="${albumNameVal}" onchange="siteConfig.services[${i}].albumName=this.value" placeholder="Майстер-класи, Весільний декор тощо">
+            </div>
+            <div class="form-group">
+              <label class="form-label">📷 Додати фото до цієї послуги з ПК</label>
+              <label class="btn btn-outline btn-sm" style="display:block; text-align:center; cursor:pointer; background:#FFFFFF;">
+                📁 Вибрати файл фотознімка
+                <input type="file" accept="image/*" style="display:none;" onchange="uploadServicePhoto(${i}, this)">
+              </label>
+            </div>
           </div>
         `;
         container.appendChild(card);
       });
     }
 
-    function addNewPhotoPrompt() {
-      const title = prompt('Назва фото:', 'Новий букет');
-      const src = prompt('Шлях до фото:', 'images/photo_1.jpg');
-      if (title && src) { siteConfig.gallery.push({ title, src, cat: 'mk' }); renderPhotosTab(); }
+    function uploadServicePhoto(serviceIndex, inputElem) {
+      if (inputElem.files && inputElem.files[0]) {
+        optimizeAndUploadImage(inputElem.files[0], function(dataUrl) {
+          if (!siteConfig.services[serviceIndex].photos) {
+            siteConfig.services[serviceIndex].photos = [];
+          }
+          siteConfig.services[serviceIndex].photos.push(dataUrl);
+          alert('Фото з ПК успішно додано до послуги #' + (serviceIndex + 1) + '! 🌸');
+          renderServicesTab();
+        });
+      }
     }
 
     function saveSettings() {
