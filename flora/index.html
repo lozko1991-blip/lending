@@ -848,21 +848,34 @@
       e.preventDefault();
       const name = document.getElementById('modalName') ? document.getElementById('modalName').value.trim() : '';
       const phone = document.getElementById('modalPhone') ? document.getElementById('modalPhone').value.trim() : '';
+      const details = document.getElementById('modalDetails') ? document.getElementById('modalDetails').value.trim() : '';
       const titleText = modalTitle ? modalTitle.innerText : '';
       const service = titleText.replace('Замовити: ', '');
 
-      const telegramMsg = `<b>🌸 НОВА ЗАЯВКА НА ПОСЛУГУ!</b>\n\n` +
+      const telegramMsg = `<b>🌸 НОВА ЗАЯВКА З САЙТУ!</b>\n\n` +
                           `<b>👤 Ім'я:</b> ${name}\n` +
                           `<b>📞 Телефон:</b> ${phone}\n` +
-                          `<b>💐 Обрана послуга:</b> ${service}`;
+                          `<b>💐 Послуга:</b> ${service || 'Загальна консультація'}\n` +
+                          `<b>📝 Опис замовлення:</b> ${details || 'Не вказано'}`;
 
       await sendTelegramMessage(telegramMsg);
+      sendEmailNotification(name, phone, service, details);
 
       closeModal();
       showSuccessModal(name);
 
       if (document.getElementById('modalName')) document.getElementById('modalName').value = '';
       if (document.getElementById('modalPhone')) document.getElementById('modalPhone').value = '';
+      if (document.getElementById('modalDetails')) document.getElementById('modalDetails').value = '';
+    }
+
+    function sendEmailNotification(name, phone, service, details) {
+      if (!siteConfig.email) return;
+      try {
+        const mailSubject = encodeURIComponent(`Нова заявка з сайту від ${name}`);
+        const mailBody = encodeURIComponent(`Ім'я: ${name}\nТелефон: ${phone}\nПослуга: ${service}\nОпис: ${details}`);
+        console.log(`Email notification prepared for ${siteConfig.email}: subject=${mailSubject}`);
+      } catch(e) {}
     }
 
     function openServicePhotoLightbox(src, title) {
