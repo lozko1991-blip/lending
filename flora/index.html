@@ -665,12 +665,15 @@
     }
 
     .services-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
       gap: 32px;
     }
 
     .service-card {
+      flex: 1 1 320px;
+      max-width: 370px;
       background: #FFFFFF;
       border-radius: var(--radius-lg);
       padding: 40px;
