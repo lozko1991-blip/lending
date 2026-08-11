@@ -202,63 +202,6 @@
       100% { box-shadow: 0 0 0 0 rgba(39, 174, 96, 0); transform: scale(1); }
     }
 
-    @media (max-width: 768px) {
-      .mobile-call-pulse-btn { display: flex !important; }
-    }
-
-    /* Floating Telegram & Viber Widgets — HIDDEN by default, shown only inside speed dial */
-    .floating-widget {
-      display: none !important;
-    }
-
-    .widget-icon {
-      width: 42px;
-      height: 42px;
-      background: #0088cc;
-      color: #FFFFFF;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.3rem;
-    }
-
-    .widget-text {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--text-main);
-    }
-
-    .portfolio-tab {
-      background: #FFFFFF;
-      border: 1px solid var(--rose-light);
-      color: var(--text-body);
-      padding: 8px 18px;
-      border-radius: 50px;
-      font-weight: 500;
-      cursor: pointer;
-      font-size: 0.95rem;
-      transition: all 0.3s ease;
-    }
-    .portfolio-tab.active, .portfolio-tab:hover {
-      background: linear-gradient(135deg, #C25975 0%, #8F2D46 100%);
-      color: #FFFFFF;
-      border-color: transparent;
-      box-shadow: 0 4px 15px rgba(143, 45, 70, 0.25);
-    }
-    @media (max-width: 768px) {
-      .portfolio-grid {
-        display: grid !important;
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: 12px !important;
-      }
-      .portfolio-item img {
-        height: 180px !important;
-        object-fit: cover !important;
-        border-radius: 16px !important;
-      }
-    }
-
     /* HEADER */
     @media (max-width: 768px) {
       .nav-links { display: none !important; }
@@ -288,17 +231,32 @@
       .gallery-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
       .gallery-card { aspect-ratio: 1/1 !important; }
 
-      /* PORTFOLIO MOBILE */
-      .portfolio-grid { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
-      .portfolio-item img { height: 170px !important; object-fit: cover !important; }
 
+      /* GLOBAL MOBILE */
+      .section { padding: 70px 0 !important; }
+      .container { padding: 0 16px !important; }
+
+      /* REVIEWS MOBILE */
+      .reviews-grid { grid-template-columns: 1fr !important; }
+      .review-card { padding: 24px !important; }
+
+      /* FAQ MOBILE */
+      .faq-container { max-width: 100% !important; padding: 0 8px !important; }
+      .faq-question { font-size: 1.1rem !important; padding: 18px 12px !important; }
+
+      /* LIGHTBOX MOBILE */
+      .lightbox-arrow { width: 40px !important; height: 40px !important; font-size: 1.4rem !important; }
+      .lightbox-arrow.prev { left: -12px !important; }
+      .lightbox-arrow.next { right: -12px !important; }
+      .lightbox-box img { max-height: 60vh !important; }
+      .lightbox-caption { font-size: 1.2rem !important; }
+
+      /* FORM MOBILE */
+      .form-input, .form-select, .form-textarea { font-size: 16px !important; }
+      .btn { min-height: 48px !important; }
       /* CONTACT FORM MOBILE */
       .contact-form-card { padding: 24px !important; }
     }
-    @media (max-width: 992px) {
-      .header-phone-link { display: none !important; }
-    }
-
     header {
       position: fixed;
       top: 0;
@@ -407,9 +365,8 @@
     }
 
     .service-tag {
-      position: absolute;
-      top: 24px;
-      right: 24px;
+      display: inline-block;
+      margin-bottom: 12px;
       background: var(--bg-blush);
       color: var(--rose-dark);
       font-size: 0.75rem;
@@ -626,12 +583,12 @@
       color: var(--text-muted);
       transition: all 0.4s ease;
     }
-    .faq-item.active .faq-answer {
+    .faq-item.open .faq-answer {
       max-height: 500px;
       padding: 0 24px 24px;
       opacity: 1;
     }
-    .faq-item.active .faq-icon {
+    .faq-item.open .faq-icon {
       transform: rotate(45deg);
     }
 
@@ -775,6 +732,20 @@
     </div>
   </div>
 
+  <!-- ORDER MODAL -->
+  <div id="orderModal" style="display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(8px); z-index: 9999; align-items: center; justify-content: center; padding: 20px;" onclick="closeModal(event)">
+    <div style="background: #FFFFFF; width: 100%; max-width: 440px; border-radius: 24px; padding: 40px; position: relative; box-shadow: 0 25px 70px rgba(0,0,0,0.3);" onclick="event.stopPropagation()">
+      <button onclick="closeModal()" style="position: absolute; top: 18px; right: 20px; font-size: 1.8rem; background: none; border: none; cursor: pointer; color: #8C787C;">&times;</button>
+      <h3 style="font-family: 'Cormorant Garamond', serif; font-size: 2rem; margin-bottom: 20px; color: #8F2D46;" id="modalTitle"></h3>
+      <form onsubmit="handleModalSubmit(event)" style="display: flex; flex-direction: column; gap: 18px;">
+        <div style="margin-bottom: 0;"><input type="text" id="modalName" placeholder="Ваше ім'я" class="form-input" required></div>
+        <div style="margin-bottom: 0;"><input type="tel" id="modalPhone" placeholder="Ваш телефон" class="form-input" required></div>
+        <div style="margin-bottom: 0;"><textarea id="modalDetails" placeholder="Опишіть деталі замовлення" class="form-textarea" rows="3"></textarea></div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Надіслати заявку</button>
+      </form>
+    </div>
+  </div>
+
   <!-- LIGHTBOX MODAL -->
   <div class="lightbox-modal" id="lightboxModal" onclick="closeLightbox(event)">
     <div class="lightbox-box" onclick="event.stopPropagation()">
@@ -788,6 +759,20 @@
   </div>
 
   
+
+
+  <!-- REVIEWS SECTION -->
+  <section class="section" style="background: var(--bg-ivory);" id="reviews">
+    <div class="container">
+      <div class="section-header reveal">
+        <div class="section-subtitle-tag">Відгуки</div>
+        <h2 class="section-title">Що кажуть клієнти</h2>
+        <p class="section-description">Чесні відгуки від людей, для яких ми створювали квіткову магію</p>
+      </div>
+      <div class="reviews-grid" id="dynamicReviewsGrid"></div>
+    </div>
+  </section>
+
   <!-- FAQ SECTION -->
   <section class="section faq-section" id="faq">
     <div class="container">
@@ -852,10 +837,12 @@
       </div>
       <div class="contact-form-card reveal">
         <h3>Залишити заявку</h3>
-        <form onsubmit="event.preventDefault(); alert('Дякуємо! Заявку прийнято.');">
-          <div class="form-group"><input type="text" placeholder="Ваше ім'я" class="form-input" required></div>
-          <div class="form-group"><input type="tel" placeholder="Ваш телефон" class="form-input" required></div>
-          <button type="submit" class="btn btn-primary" style="width:100%;">Надіслати заявку 🌸</button>
+        <form id="mainContactForm" onsubmit="handleFormSubmit(event)">
+          <div class="form-group"><input type="text" id="clientName" placeholder="Your name" class="form-input" required></div>
+          <div class="form-group"><input type="tel" id="clientPhone" placeholder="Ваш телефон" class="form-input" required></div>
+          <div class="form-group"><select id="serviceSelect" class="form-select"><option value="">Оберіть послугу</option><option value="Майстер-клас">Майстер-клас для дітей та дорослих</option><option value="B2B Навчання">B2B Навчання для магазинів</option><option value="Весільна флористика">Весільна флористика та декор</option><option value="WOW-доставка">WOW-доставка великих букетів</option></select></div>
+          <div class="form-group"><textarea id="clientMessage" placeholder="Опишіть ваше замовлення" class="form-textarea" rows="2"></textarea></div>
+          <div class="form-group"><select id="serviceSelect" class="form-select"><option value="">Оберіть послугу</option><option value="Майстер-клас">Майстер-клас</option><option value="B2B Навчання">B2B Навчання</option><option value="Весільна флористика">Весільна флористика</option><option value="WOW-доставка">WOW-доставка</option></select></div><div class="form-group"><textarea id="clientMessage" placeholder="Опишіть замовлення" class="form-textarea" rows="2"></textarea></div><button type="submit" class="btn btn-primary" style="width:100%;">Надіслати заявку</button>
         </form>
       </div>
     </div>
@@ -978,6 +965,7 @@
       renderServicesCatalog();
       renderPortfolioGallery();
       renderGalleryAndAlbums();
+      renderReviews();
     }
 
     async function sendTelegramMessage(text) {
@@ -1276,6 +1264,16 @@
       } catch(e) {}
     }
 
+    function renderReviews() {
+      var grid = document.getElementById("dynamicReviewsGrid");
+      if (!grid) return;
+      var reviews = siteConfig.reviews || DEFAULT_REVIEWS;
+      if (!reviews.length) { grid.innerHTML = ""; return; }
+      grid.innerHTML = reviews.map(function(r) {
+        return '<div class="review-card reveal"><div class="review-stars">' + "★".repeat(r.stars || 5) + "☆".repeat(5 - (r.stars || 5)) + '</div><p style="color:var(--text-body);font-size:0.95rem;line-height:1.6;margin-bottom:16px;">"' + r.text + '"</p><div style="display:flex;align-items:center;gap:12px;"><img src="' + (r.avatar || '') + '" style="width:48px;height:48px;border-radius:50%;object-fit:cover;background:var(--rose-light);" onerror="this.style.display=\'none\'"><div><div style="font-weight:700;color:var(--text-main);">' + r.name + '</div><div style="font-size:0.82rem;color:var(--text-muted);">' + r.role + '</div></div></div></div>';
+      }).join("");
+    }
+
     function openServicePhotoLightbox(src, title) {
       const img = document.getElementById('lightboxImg');
       const caption = document.getElementById('lightboxCaption');
@@ -1305,7 +1303,8 @@
         const btn = document.createElement('button');
         btn.className = `album-btn ${activeCategoryFilter === catKey ? 'active' : ''}`;
         btn.innerText = albumMap[catKey];
-        btn.onclick = () => { activeCategoryFilter = catKey; renderGalleryAndAlbums(); };
+        btn.onclick = () => { activeCategoryFilter = catKey; renderGalleryAndAlbums();
+      renderReviews(); };
         filterBox.appendChild(btn);
       });
 
@@ -1387,7 +1386,7 @@
     // FAQ Accordion
     function toggleFAQ(button) {
       const item = button.parentElement;
-      item.classList.toggle('active');
+      item.classList.toggle('open');
     }
   </script>
 
