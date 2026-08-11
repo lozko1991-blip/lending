@@ -1,202 +1,116 @@
 # Karina Flowers — Структура сайту (index.html)
 
-> **Файл:** `index.html` | **Рядків:** ~1411 | **Кодування:** UTF-8
+> **Файл:** `index.html` | **Рядків:** ~1394 | **Кодування:** UTF-8
+> **Оновлено:** після всіх фіксів (FAQ акордеон, сервіс-теги, контактна форма)
 
 ---
 
-## Конфігурація (DEFAULT_CONFIG)
+## Карта файлів сайту
 
-Зберігається у localStorage ключ `karina_admin_config`. При завантаженні мерджиться поверх `DEFAULT_CONFIG`.
+| Файл | Розмір | Призначення |
+|------|--------|-------------|
+| `index.html` | ~3 516 KB | Головна сторінка (з base64 фото в JS) |
+| `admin.html` | ~3 058 KB | Панель управління |
+| `favicon.jpg` | 105 KB | Іконка сайту |
+| `images/` | 22 файли | Фотографії галереї (зовнішні) |
+| `docs/SITE_STRUCTURE.md` | 9 KB | Ця документація |
+| `docs/DESIGN.md` | — | Дизайн-система (кольори, стилі, блоки) |
+| `docs/ADMIN_STRUCTURE.md` | 7 KB | Документація адмінки |
+| `publish.ps1` | 2 KB | Скрипт публікації на GitHub |
+
+### images/ — фото галереї (22 шт.)
+- `photo_1.jpg` (155 KB) … `photo_11.jpg` (116 KB)
+- `photo_2026-08-09_11-35-14.jpg` … `photo_2026-08-09_11-35-50.jpg` (11 шт.)
+- Використовуються адмінкою (upload по URL) та галереєю через `siteConfig.gallery`
+
+---
+
+## HTML структура (зверху вниз)
+
+| # | Елемент | Рядки | ID | Призначення |
+|---|---------|-------|-----|-------------|
+| 1 | Speed Dial | 599-626 | `#speedDialMenu`, `#callFloatingBtn`, `#displayViberLink`, `#displayTelegramLink`, `#displayCallLink` | Плаваюча кнопка + меню Viber/Telegram/Дзвінок, z-index 1050 |
+| 2 | Header | 628-645 | — | Лого, навігація, кнопка "Замовити дзвінок", z-index 1000 |
+| 3 | Hero | 647-661 | `#hero`, `#displayHeroTitle`, `#displayHeroSubtitle`, `#heroMainPhoto` | Заголовок + фото в арці |
+| 4 | About | 663-677 | `#about`, `#aboutPhoto`, `#displayAboutTitle`, `#displayAboutLead` | Фото + текст про Карінку |
+| 5 | Services | 679-692 | `#services`, `#dynamicServicesGrid` | 4 картки послуг (динамічний рендер) |
+| 6 | Portfolio | 694-707 | `#portfolio`, `#dynamicAlbumFilterBtns`, `#galleryGrid` | Галерея з фільтрами альбомів |
+| 7 | Mobile Nav | 709-721 | `#mobileNavDrawer` | Повноекранне меню, z-index 9998 |
+| 8 | Success Modal | 723-734 | `#successModal`, `#successModalTitle`, `#successModalText` | Підтвердження заявки, z-index 9999 |
+| 9 | Order Modal | 736-748 | `#orderModal`, `#modalTitle`, `#modalName`, `#modalPhone`, `#modalDetails` | Форма замовлення, z-index 9999 |
+| 10 | Lightbox | 750-763 | `#lightboxModal`, `#lightboxImg`, `#lightboxCaption`, `#lightboxCounter` | Перегляд фото, z-index 2000 |
+| 11 | Reviews | 765-775 | `#reviews`, `#dynamicReviewsGrid` | Відгуки клієнтів |
+| 12 | FAQ | 777-828 | `#faq` | 4 питання-акордеон |
+| 13 | Contact | 830-849 | `#contact`, `#displayPhoneLink`, `#displayEmailText`, `#mainContactForm`, `#clientName`, `#clientPhone`, `#serviceSelect`, `#clientMessage` | Контакти + форма заявки |
+| 14 | Footer | 851-856 | — | © 2026 + лінк на адмінку |
+
+---
+
+## Контактна форма (mainContactForm) — ОДИН екземпляр полів
 
 ```
-telegramToken       — string (бот токен)
-telegramChatId      — string (ID чату)
-telegramUsername    — string (@username)
-phone               — string (телефон)
-email               — string
-viberPhone          — string
-viberEnabled        — boolean
-fontFamily          — string (CSS)
-heroTitle           — string (HTML дозволено)
-heroSubtitle        — string
-aboutTitle          — string (HTML дозволено)
-aboutLead           — string
-heroPhoto           — string (base64 URL)
-aboutPhoto          — string (base64 URL)
-services            — DEFAULT_SERVICES[]
-gallery             — DEFAULT_GALLERY[]
-reviews             — DEFAULT_REVIEWS[]
+#clientName    — text, required, placeholder "Ваше ім'я"
+#clientPhone   — tel, required, placeholder "Ваш телефон"
+#serviceSelect — select (4 опції: Майстер-клас, B2B Навчання, Весільна флористика, WOW-доставка)
+#clientMessage — textarea (2 rows), "Опишіть ваше замовлення"
+button submit  — "Надіслати заявку 🌸"
+onsubmit       — handleFormSubmit(event)
 ```
 
----
-
-## Секції сайту (зверху вниз)
-
-### 1. Speed Dial (фіксована кнопка)
-- `#speedDialMenu` — приховане меню (Viber, Telegram, Дзвінок)
-- `#callFloatingBtn` — зелена кнопка з пульсацією, z-index 1050
-- OnClick: `toggleSpeedDial()`
-
-### 2. Header (фіксований)
-- Логотип "Karinka Flowers"
-- Навігація: Про мене (#about), Послуги (#services), Портфоліо (#portfolio), Контакти (#contact)
-- `.header-cta` — кнопка "Замовити дзвінок" → `scrollToContactForm('Замовити дзвінок')`
-- `.mobile-menu-btn` — бургер (тільки на mobile), `toggleMobileMenu()`
-- z-index: 1000
-
-### 3. Hero (#hero)
-- `#displayHeroTitle` — заголовок h1
-- `#displayHeroSubtitle` — підзаголовок
-- `#heroMainPhoto` — головне фото
-- Кнопка "Обрати послугу" → #services
-
-### 4. About (#about)
-- `#aboutPhoto` — фото
-- `#displayAboutTitle` — заголовок h2
-- `#displayAboutLead` — текст
-
-### 5. Services (#services)
-- `#dynamicServicesGrid` — динамічний контейнер карток
-- 4 послуги: Майстер-класи, B2B Навчання, Весільна флористика, WOW-доставка
-- Кожна картка: тег, назва, опис, міні-галерея (до 4 фото), ціна, кнопка "Замовити послугу" → `openModal()`
-
-### 6. Portfolio (#portfolio)
-- `#dynamicAlbumFilterBtns` — динамічні кнопки фільтрів альбомів
-- `#galleryGrid` — сітка фото
-- 11 фото початково, фільтрація по альбомах
-
-### 7. Reviews (#reviews)
-- `#dynamicReviewsGrid` — сітка карток відгуків
-- Зірочки, текст, аватар, ім'я, роль
-
-### 8. FAQ (#faq)
-- 4 питання-відповіді (акордеон): весільний декор, майстер-класи для новачків, довговічність букетів, доставка
-- OnClick: `toggleFAQ(this)`
-
-### 9. Contact (#contact)
-- `#displayPhoneLink` — телефон
-- `#displayEmailText` — email
-- `#mainContactForm` — форма заявки
-  - `#clientName` (text, required)
-  - `#clientPhone` (tel, required)
-  - `#serviceSelect` (select)
-  - `#clientMessage` (textarea)
-  - OnSubmit: `handleFormSubmit(event)` → Telegram + mailto:
-
-### 10. Footer
-- © 2026 Karina Flowers
-- Лінк на адмінку
+**ВАЖЛИВО:** поля `serviceSelect`/`clientMessage` НЕ дублюються (фікс 2026). Дублікат ID ламає форму.
 
 ---
 
-## Модальні вікна
+## JavaScript функції (актуальні рядки)
 
-| ID | Призначення | z-index | Як відкрити |
-|----|-------------|---------|-------------|
-| `#mobileNavDrawer` | Мобільне меню | 9998 | `toggleMobileMenu()` |
-| `#successModal` | Успішна відправка | 9999 | `showSuccessModal(name)` |
-| `#orderModal` | Замовлення послуги | 9999 | `openModal(serviceName)` |
-| `#lightboxModal` | Перегляд фото | 2000 | `openLightboxByIndex(index)` |
-
-### Order Modal форма
-- `#modalTitle` — назва послуги
-- `#modalName` — ім'я (text, required)
-- `#modalPhone` — телефон (tel, required)
-- `#modalDetails` — деталі (textarea)
-- OnSubmit: `handleModalSubmit(event)` → Telegram + mailto: + close + success modal
-
----
-
-## JavaScript функції
-
-### Ініціалізація
-| Функція | Призначення |
-|---------|-------------|
-| `loadSiteConfig()` | Завантажує конфіг з localStorage, викликає applyConfigToDOM |
-| `applyConfigToDOM()` | Оновлює всі DOM-елементи: телефони, тексти, фото, рендерить каталоги |
-
-### Рендеринг
-| Функція | Призначення |
-|---------|-------------|
-| `renderServicesCatalog()` | Рендерить картки послуг у #dynamicServicesGrid |
-| `renderPortfolioGallery()` | Рендерить портфоліо у #portfolioGrid |
-| `renderGalleryAndAlbums()` | Рендерить галерею + фільтри у #galleryGrid + #dynamicAlbumFilterBtns |
-| `renderReviews()` | Рендерить відгуки у #dynamicReviewsGrid |
+### Ініціалізація та рендеринг
+| Функція | Рядок | Призначення |
+|---------|-------|-------------|
+| `loadSiteConfig()` | 887 | Завантаження конфігу з localStorage |
+| `applyConfigToDOM()` | 900 | Оновлення всіх DOM-елементів |
+| `renderPortfolioGallery()` | 1099 | Портфоліо-сітка (застаріла, не використовується в DOM) |
+| `filterPortfolio()` | 1142 | Фільтр портфоліо |
+| `expandMobilePortfolio()` | 1150 | Розгортання на мобільному |
+| `renderServicesCatalog()` | 1157 | Картки послуг |
+| `renderGalleryAndAlbums()` | 1287 | Галерея + фільтри |
+| `renderReviews()` | 1267 | Відгуки |
 
 ### Форми та модали
-| Функція | Призначення |
-|---------|-------------|
-| `handleFormSubmit(e)` | Обробка контактної форми → Telegram + mailto: + success modal |
-| `openModal(name)` | Відкриває order modal |
-| `closeModal(e)` | Закриває order modal |
-| `handleModalSubmit(e)` | Обробка модальної форми → Telegram + mailto: |
-| `showSuccessModal(name)` | Показує success modal |
-| `closeSuccessModal(e)` | Закриває success modal |
-| `scrollToContactForm(name)` | Скрол до форми + встановлює serviceSelect |
-
-### Telegram
-| Функція | Призначення |
-|---------|-------------|
-| `sendTelegramMessage(text)` | POST до Telegram Bot API |
+| Функція | Рядок | Призначення |
+|---------|-------|-------------|
+| `sendTelegramMessage()` | 971 | Відправка в Telegram |
+| `scrollToContactForm()` | 996 | Скрол до форми |
+| `showSuccessModal()` | 1011 | Показати success modal |
+| `handleFormSubmit()` | 1027 | Обробка контактної форми |
+| `openModal()` | 1214 | Відкрити order modal |
+| `closeModal()` | 1223 | Закрити order modal |
+| `handleModalSubmit()` | 1233 | Обробка модальної форми |
+| `sendEmailNotification()` | 1258 | mailto: fallback |
 
 ### Галерея / Lightbox
-| Функція | Призначення |
-|---------|-------------|
-| `openLightboxByIndex(index)` | Відкриває фото за індексом |
-| `prevLightboxImage()` | Попереднє фото |
-| `nextLightboxImage()` | Наступне фото |
-| `closeLightbox(e)` | Закриває лайтбокс |
-| `openServicePhotoLightbox(src, title)` | Лайтбокс для фото з картки послуги |
+| Функція | Рядок | Призначення |
+|---------|-------|-------------|
+| `openServicePhotoLightbox()` | 1277 | Лайтбокс з картки послуги |
+| `openLightboxByIndex()` | 1329 | Відкрити за індексом |
+| `prevLightboxImage()` | 1339 | Попереднє |
+| `nextLightboxImage()` | 1344 | Наступне |
+| `closeLightbox()` | 1349 | Закрити |
 
-### Навігація
-| Функція | Призначення |
-|---------|-------------|
-| `toggleMobileMenu()` | Відкриває/закриває мобільне меню |
-| `navigateToSection(id)` | Закриває меню + скрол до секції |
-| `toggleSpeedDial()` | Відкриває/закриває speed dial |
+### Навігація та інше
+| Функція | Рядок | Призначення |
+|---------|-------|-------------|
+| `toggleMobileMenu()` | 1056 | Мобільне меню |
+| `navigateToSection()` | 1069 | Скрол до секції |
+| `toggleSpeedDial()` | 1077 | Speed dial |
+| `toggleFAQ()` | 1387 | Акордеон FAQ — **використовує клас `open`, НЕ `active`** |
 
-### Інше
-| Функція | Призначення |
-|---------|-------------|
-| `toggleFAQ(btn)` | Акордеон FAQ |
-| `filterPortfolio(cat, btn)` | Фільтр портфоліо (всі/букети/весільні/майстер-класи) |
-| `expandMobilePortfolio()` | "Переглянути всі" на мобільному |
-| `sendEmailNotification(...)` | Відкриває mailto: лінк |
+### Події
+| Рядок | Подія | Дія |
+|-------|-------|-----|
+| 1355 | DOMContentLoaded | loadSiteConfig + header scroll |
+| 1371 | IntersectionObserver | Анімація `.reveal` → додає `.active` |
 
----
-
-## CSS змінні (кольори)
-
-```
---bg-ivory: #FAF6F3      — фон сторінки
---bg-warm: #FFFBF9       — теплий фон для секцій
---bg-card: #FFFFFF        — фон карток
---bg-blush: #F7EBEF      — рожевий фон
---rose-light: #F4D8E1     — світло-рожевий
---rose-soft: #E8B4C3      — м'який рожевий
---rose-medium: #D9899E    — середній рожевий
---rose-deep: #C25975      — глибокий рожевий (основний)
---rose-dark: #8F2D46      — темно-рожевий
---text-main: #2E1F23      — основний текст
---text-body: #59474B      — текст абзаців
---text-muted: #8C787C     — приглушений текст
---font-heading: 'Cormorant Garamond', serif
-```
-
----
-
-## Мобільна версія (≤768px)
-
-- Header: 65px, бургер-меню, CTA приховано
-- Hero: 1 колонка, фото 85%×300px
-- About: 1 колонка, фото 280px
-- Services: картки 100% ширини
-- Gallery: 2 колонки, квадратні фото
-- Reviews: 1 колонка
-- Contact: 1 колонка
-- Section padding: 70px (замість 110px)
-- Lightbox: зменшені стрілки, max-height 60vh
-- Inputs: font-size 16px (запобігає iOS autozoom)
+**ВАЖЛИВО:** FAQ акордеон використовує клас `.open` (не `.active`), бо `.active` конфліктує зі scroll-анімацією `.reveal.active`. Не повертати `.active`!
 
 ---
 
@@ -204,15 +118,15 @@ reviews             — DEFAULT_REVIEWS[]
 
 ```
 localStorage("karina_admin_config")
-  └─ loadSiteConfig()
-      └─ siteConfig = merge(DEFAULT_CONFIG, parsed)
-          └─ applyConfigToDOM()
-              ├─ Телефони / Viber / Telegram лінки
+  └─ loadSiteConfig() (887)
+      └─ siteConfig = merge(DEFAULT_CONFIG (863), parsed)
+          └─ applyConfigToDOM() (900)
+              ├─ Лінки (phone, viber, telegram, call)
               ├─ Тексти (hero, about, email)
               ├─ Фото (heroMainPhoto, aboutPhoto)
-              ├─ CSS (font-family)
-              ├─ renderServicesCatalog()
-              ├─ renderPortfolioGallery()
-              ├─ renderGalleryAndAlbums()
-              └─ renderReviews()
+              ├─ CSS (--font-heading)
+              ├─ renderServicesCatalog() (1157)
+              ├─ renderPortfolioGallery() (1099)
+              ├─ renderGalleryAndAlbums() (1287)
+              └─ renderReviews() (1267)
 ```
