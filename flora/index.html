@@ -884,7 +884,24 @@
     let currentGalleryIndex = 0;
     let activeCategoryFilter = 'all';
 
-    function loadSiteConfig() {
+    async function loadSiteConfig() {
+      // 1. Спершу пробуємо отримати актуальні дані з GitHub (site-data.json)
+      //    Відносний шлях працює на GitHub Pages: /lending/flora/site-data.json
+      try {
+        const res = await fetch('site-data.json', { cache: 'no-store' });
+        if (res.ok) {
+          const remote = await res.json();
+          siteConfig = { ...DEFAULT_CONFIG, ...remote };
+          if (!siteConfig.services || !siteConfig.services.length) siteConfig.services = DEFAULT_SERVICES;
+          if (!siteConfig.gallery || !siteConfig.gallery.length) siteConfig.gallery = DEFAULT_GALLERY;
+          applyConfigToDOM();
+          return;
+        }
+      } catch(e) {
+        // site-data.json недоступний (наприклад, локальний запуск) — падаємо нижче
+      }
+
+      // 2. Fallback: локальний конфіг (localStorage) для офлайн/локального перегляду
       const saved = localStorage.getItem('karina_admin_config');
       if (saved) {
         try {
@@ -918,6 +935,7 @@
       const cleanV = (siteConfig.viberPhone || siteConfig.phone || '').replace(/[^0-9]/g, '');
       const displayViberLink = document.getElementById('displayViberLink');
       if (displayViberLink && cleanV) displayViberLink.href = 'viber://chat?number=%2B' + cleanV;
+      if (displayViberLink) displayViberLink.style.display = siteConfig.viberEnabled !== false ? 'flex' : 'none';
 
       const displayTelegramLink = document.getElementById('displayTelegramLink');
       if (displayTelegramLink) displayTelegramLink.href = tgUrl;

@@ -287,6 +287,30 @@
           <input type="email" id="cfgEmail" class="form-input">
         </div>
       </div>
+      <h3 style="font-size: 1.4rem; margin-top: 10px; margin-bottom: 16px;">🌍 Автопублікація на GitHub (щоб зміни бачили всі)</h3>
+      <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 14px;">
+        Вставте GitHub Token один раз. Після цього кожне збереження буде публікувати зміни на сайт автоматично — їх бачитимуть усі пристрої.
+      </p>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">GitHub Token</label>
+          <input type="password" id="cfgGithubToken" class="form-input" placeholder="github_pat_...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Власник репозиторію</label>
+          <input type="text" id="cfgGithubOwner" class="form-input" placeholder="lozko1991-blip">
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Назва репозиторію</label>
+          <input type="text" id="cfgGithubRepo" class="form-input" placeholder="lending">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Гілка</label>
+          <input type="text" id="cfgGithubBranch" class="form-input" placeholder="main">
+        </div>
+      </div>
     </div>
 
     <!-- TAB 2: SERVICES (PRODUCTS) -->
@@ -369,7 +393,20 @@
 
     let siteConfig = { ...DEFAULT_CONFIG };
 
-    function loadConfig() {
+    async function loadConfig() {
+      // 1. Спершу читаємо актуальні дані з GitHub (site-data.json) — щоб бачити опублікований стан
+      try {
+        const res = await fetch('site-data.json', { cache: 'no-store' });
+        if (res.ok) {
+          const remote = await res.json();
+          siteConfig = { ...DEFAULT_CONFIG, ...remote };
+          if (!siteConfig.services || !siteConfig.services.length) siteConfig.services = DEFAULT_SERVICES;
+          if (!siteConfig.gallery || !siteConfig.gallery.length) siteConfig.gallery = DEFAULT_GALLERY;
+          return;
+        }
+      } catch(e) {}
+
+      // 2. Fallback: локальний конфіг
       const saved = localStorage.getItem('karina_admin_config');
       if (saved) {
         try {
@@ -414,6 +451,12 @@
       document.getElementById('cfgHeroSubtitle').value = siteConfig.heroSubtitle || '';
       document.getElementById('cfgAboutTitle').value = siteConfig.aboutTitle || '';
       document.getElementById('cfgAboutLead').value = siteConfig.aboutLead || '';
+
+      const gh = loadGithubSettings();
+      document.getElementById('cfgGithubToken').value = gh.token || '';
+      document.getElementById('cfgGithubOwner').value = gh.owner || 'lozko1991-blip';
+      document.getElementById('cfgGithubRepo').value = gh.repo || 'lending';
+      document.getElementById('cfgGithubBranch').value = gh.branch || 'main';
 
       renderServicesTab();
       renderPhotosTab();
@@ -573,6 +616,114 @@
       renderServicesTab();
     }
 
+    // ===== GITHUB SYNC (автопублікація змін на сайт) =====
+    const GITHUB_DEFAULTS = {
+      owner: 'lozko1991-blip',
+      repo: 'lending',
+      branch: 'main',
+      token: ''
+    };
+
+    function loadGithubSettings() {
+      try {
+        const saved = localStorage.getItem('karina_github_settings');
+        if (saved) return { ...GITHUB_DEFAULTS, ...JSON.parse(saved) };
+      } catch(e) {}
+      return { ...GITHUB_DEFAULTS };
+    }
+
+    function saveGithubSettingsToStorage() {
+      const gh = {
+        token: document.getElementById('cfgGithubToken').value.trim(),
+        owner: document.getElementById('cfgGithubOwner').value.trim() || 'lozko1991-blip',
+        repo: document.getElementById('cfgGithubRepo').value.trim() || 'lending',
+        branch: document.getElementById('cfgGithubBranch').value.trim() || 'main'
+      };
+      localStorage.setItem('karina_github_settings', JSON.stringify(gh));
+      return gh;
+    }
+
+    function githubHeaders(gh) {
+      return {
+        'Authorization': 'Bearer ' + gh.token,
+        'Accept': 'application/vnd.github+json',
+        'Content-Type': 'application/json'
+      };
+    }
+
+    async function githubUploadImage(gh, base64DataUrl, filename) {
+      if (!gh.token) return null;
+      const base64 = base64DataUrl.split(',')[1] || base64DataUrl;
+      const path = 'flora/images/' + filename;
+      const url = 'https://api.github.com/repos/' + gh.owner + '/' + gh.repo + '/contents/' + path;
+      try {
+        const res = await fetch(url, {
+          method: 'PUT',
+          headers: githubHeaders(gh),
+          body: JSON.stringify({ message: 'upload photo ' + filename, content: base64, branch: gh.branch })
+        });
+        if (res.ok) return 'images/' + filename;
+        const err = await res.text();
+        console.log('GitHub upload error:', res.status, err);
+      } catch(e) { console.log('GitHub upload exception:', e); }
+      return null;
+    }
+
+    async function githubGetExistingSha(gh, path) {
+      const url = 'https://api.github.com/repos/' + gh.owner + '/' + gh.repo + '/contents/' + path + '?ref=' + gh.branch;
+      try {
+        const res = await fetch(url, { headers: githubHeaders(gh) });
+        if (res.ok) {
+          const data = await res.json();
+          return data.sha;
+        }
+      } catch(e) {}
+      return null;
+    }
+
+    async function githubPushSiteData(gh) {
+      if (!gh.token) return false;
+      const payload = JSON.stringify(siteConfig);
+      const base64 = btoa(unescape(encodeURIComponent(payload)));
+      const path = 'flora/site-data.json';
+      const url = 'https://api.github.com/repos/' + gh.owner + '/' + gh.repo + '/contents/' + path;
+      const body = { message: 'update site content from admin', content: base64, branch: gh.branch };
+      const existingSha = await githubGetExistingSha(gh, path);
+      if (existingSha) body.sha = existingSha;
+      try {
+        const res = await fetch(url, {
+          method: 'PUT',
+          headers: githubHeaders(gh),
+          body: JSON.stringify(body)
+        });
+        return res.ok;
+      } catch(e) { console.log('GitHub push error:', e); return false; }
+    }
+
+    // Завантажує на GitHub всі base64-фото як окремі файли (images/photo_N.jpg)
+    // і замінює їх на URL, щоб site-data.json був легкий.
+    // Якщо src вже є URL (images/... або http...) — пропускає (вже завантажено).
+    async function uploadAllBase64Photos(gh) {
+      if (!gh.token) return;
+      const gallery = siteConfig.gallery || [];
+      for (let i = 0; i < gallery.length; i++) {
+        const item = gallery[i];
+        if (item.src && item.src.startsWith('data:image/')) {
+          const filename = 'photo_' + Date.now() + '_' + i + '.jpg';
+          const url = await githubUploadImage(gh, item.src, filename);
+          if (url) item.src = url;
+        }
+      }
+      if (siteConfig.heroPhoto && siteConfig.heroPhoto.startsWith('data:image/')) {
+        const url = await githubUploadImage(gh, siteConfig.heroPhoto, 'hero_' + Date.now() + '.jpg');
+        if (url) siteConfig.heroPhoto = url;
+      }
+      if (siteConfig.aboutPhoto && siteConfig.aboutPhoto.startsWith('data:image/')) {
+        const url = await githubUploadImage(gh, siteConfig.aboutPhoto, 'about_' + Date.now() + '.jpg');
+        if (url) siteConfig.aboutPhoto = url;
+      }
+    }
+
     function saveSettings() {
       siteConfig.telegramToken = document.getElementById('cfgTelegramToken').value.trim();
       siteConfig.telegramChatId = document.getElementById('cfgTelegramChatId').value.trim();
@@ -587,12 +738,32 @@
       siteConfig.aboutLead = document.getElementById('cfgAboutLead').value.trim();
 
       localStorage.setItem('karina_admin_config', JSON.stringify(siteConfig));
-      alert('Усі зміни успішно збережено та застосовано! ✨');
+      alert('Зміни збережено локально ✅. Публікую на GitHub...');
+
+      const gh = saveGithubSettingsToStorage();
+      if (!gh.token) {
+        alert('⚠️ GitHub Token не вказано. Зміни збережено лише локально (на цьому пристрої). Для публікації на сайт вставте токен у вкладці "Контакти".');
+        return;
+      }
+
+      uploadAllBase64Photos(gh).then(function() {
+        return githubPushSiteData(gh);
+      }).then(function(ok) {
+        if (ok) {
+          alert('🚀 Зміни ОПУБЛІКОВАНО на GitHub! Сайт оновиться через 1-2 хвилини на всіх пристроях.');
+        } else {
+          alert('❌ Не вдалося опублікувати на GitHub. Перевірте токен та інтернет. Зміни збережено локально.');
+        }
+      }).catch(function(e) {
+        console.log(e);
+        alert('❌ Помилка публікації: ' + e.message);
+      });
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      loadConfig();
-      if (sessionStorage.getItem('admin_authenticated') === 'true') showDashboard();
+      loadConfig().then(() => {
+        if (sessionStorage.getItem('admin_authenticated') === 'true') showDashboard();
+      });
     });
   </script>
 </body>
