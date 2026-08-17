@@ -1,6 +1,45 @@
 # Karina Flowers — Структура адмінки (admin.html)
 
-> **Файл:** `admin.html` | **Рядків:** ~599 | **Кодування:** UTF-8
+> **Файл:** `admin.html` | **Рядків:** ~769 | **Кодування:** UTF-8
+
+---
+
+## 🌍 Автопублікація на GitHub (НОВЕ)
+
+**Призначення:** зміни з адмінки публікуються в репозиторій GitHub → сайт читає їх → всі пристрої бачать оновлення.
+
+**Механіка:**
+- При "Зберегти" адмінка завантажує всі base64-фото на GitHub (`flora/images/photo_N.jpg`) та оновлює `flora/site-data.json`
+- Сайт (`index.html`) при завантаженні читає `site-data.json` (відносний шлях) → застосовує дані
+- Якщо `site-data.json` недоступний (локально) → fallback на localStorage → дефолти
+
+**Поля (вкладка "Контакти", блок "Автопублікація на GitHub"):**
+| ID | Призначення |
+|----|-------------|
+| `cfgGithubToken` | GitHub Token (зберігається в localStorage `karina_github_settings`) |
+| `cfgGithubOwner` | Власник репо (default: `lozko1991-blip`) |
+| `cfgGithubRepo` | Назва репо (default: `lending`) |
+| `cfgGithubBranch` | Гілка (default: `main`) |
+
+**Функції:**
+| Функція | Призначення |
+|---------|-------------|
+| `loadGithubSettings()` | Читає налаштування GitHub з localStorage |
+| `saveGithubSettingsToStorage()` | Зберігає налаштування GitHub |
+| `githubHeaders(gh)` | Формує Authorization header |
+| `githubUploadImage(gh, base64, name)` | PUT фото в `flora/images/` |
+| `githubGetExistingSha(gh, path)` | Отримує SHA файлу для оновлення |
+| `githubPushSiteData(gh)` | PUT `flora/site-data.json` |
+| `uploadAllBase64Photos(gh)` | Завантажує всі base64-фото конфігу як файли |
+
+**Потік збереження (`saveSettings`):**
+```
+Збір полів → localStorage → alert "Публікую..." 
+→ зберегти github налаштування 
+→ uploadAllBase64Photos (фото) 
+→ githubPushSiteData (site-data.json) 
+→ alert "ОПУБЛІКОВАНО 🚀"
+```
 
 ---
 
