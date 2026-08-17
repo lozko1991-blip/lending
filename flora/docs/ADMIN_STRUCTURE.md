@@ -1,10 +1,11 @@
 # Karina Flowers — Структура адмінки (admin.html)
 
-> **Файл:** `admin.html` | **Рядків:** ~769 | **Кодування:** UTF-8
+> **Файл:** `admin.html` | **Рядків:** ~890 | **Кодування:** UTF-8
+> **Актуалізовано:** 2026-08-17 (GitHub-синхронізація + редактор Відгуків & FAQ)
 
 ---
 
-## 🌍 Автопублікація на GitHub (НОВЕ)
+## 🌍 Автопублікація на GitHub (центральна фіча)
 
 **Призначення:** зміни з адмінки публікуються в репозиторій GitHub → сайт читає їх → всі пристрої бачать оновлення.
 
@@ -12,11 +13,19 @@
 - При "Зберегти" адмінка завантажує всі base64-фото на GitHub (`flora/images/photo_N.jpg`) та оновлює `flora/site-data.json`
 - Сайт (`index.html`) при завантаженні читає `site-data.json` (відносний шлях) → застосовує дані
 - Якщо `site-data.json` недоступний (локально) → fallback на localStorage → дефолти
+- Деплой GitHub Pages ~1-2 хв, після чого зміни бачать усі
+
+**🔑 Активація токена (важливо!):**
+- Токен **НЕ зберігається в коді** (GitHub Push Protection блокує публікацію секретів)
+- Для активації відкрити один раз: `admin.html?token=ВАШ_ТОКЕН`
+- Токен зберігається в localStorage `karina_github_settings` (на пристрої)
+- Токен автоматично прибирається з URL (history.replaceState)
+- На кожному новому пристрої — активація повторюється 1 раз
 
 **Поля (вкладка "Контакти", блок "Автопублікація на GitHub"):**
 | ID | Призначення |
 |----|-------------|
-| `cfgGithubToken` | GitHub Token (зберігається в localStorage `karina_github_settings`) |
+| `cfgGithubToken` | GitHub Token (localStorage `karina_github_settings`) |
 | `cfgGithubOwner` | Власник репо (default: `lozko1991-blip`) |
 | `cfgGithubRepo` | Назва репо (default: `lending`) |
 | `cfgGithubBranch` | Гілка (default: `main`) |
@@ -31,14 +40,15 @@
 | `githubGetExistingSha(gh, path)` | Отримує SHA файлу для оновлення |
 | `githubPushSiteData(gh)` | PUT `flora/site-data.json` |
 | `uploadAllBase64Photos(gh)` | Завантажує всі base64-фото конфігу як файли |
+| `setPublishStatus(text, type)` | Показує індикатор статусу (ok/err/wait) |
 
 **Потік збереження (`saveSettings`):**
 ```
-Збір полів → localStorage → alert "Публікую..." 
+Збір полів → localStorage → статус "⏳ Публікую..." 
 → зберегти github налаштування 
 → uploadAllBase64Photos (фото) 
 → githubPushSiteData (site-data.json) 
-→ alert "ОПУБЛІКОВАНО 🚀"
+→ статус "🚀 ОПУБЛІКОВАНО" (зелений) / "❌ Помилка" (червоний)
 ```
 
 ---
@@ -73,6 +83,7 @@ aboutPhoto          — string (base64 URL)
 services            — DEFAULT_SERVICES[]
 gallery             — DEFAULT_GALLERY[]
 reviews             — DEFAULT_REVIEWS[]
+faq                 — DEFAULT_FAQ[]
 ```
 
 ---
@@ -86,8 +97,9 @@ reviews             — DEFAULT_REVIEWS[]
 
 ### Dashboard Screen (#dashboardScreen)
 - Заголовок + кнопки: "Переглянути сайт", "Вийти"
-- 4 вкладки (таби)
+- 5 вкладок (таби)
 - Кнопка "Зберегти та Застосувати" внизу
+- `#publishStatus` — індикатор статусу публікації (під кнопкою)
 
 ---
 
@@ -118,6 +130,13 @@ reviews             — DEFAULT_REVIEWS[]
 - `#cfgAboutTitle` — заголовок About
 - `#cfgAboutLead` — текст About
 
+### Tab 5 — Відгуки & FAQ (#tabReviews) — НОВЕ
+- **Відгуки:** `#adminReviewsContainer`, кнопка "+ Додати відгук"
+  - Кожна картка: ім'я, роль, текст, оцінка (1-5), URL аватара, кнопка "Видалити"
+- **FAQ:** `#adminFaqContainer`, кнопка "+ Додати питання"
+  - Кожна картка: питання (q), відповідь (a), кнопка "Видалити"
+- Функції: `renderReviewsTab()`, `addNewReview()`, `renderFaqTab()`, `addNewFaq()`
+
 ---
 
 ## JavaScript функції
@@ -131,9 +150,17 @@ reviews             — DEFAULT_REVIEWS[]
 ### Ініціалізація
 | Функція | Призначення |
 |---------|-------------|
-| `loadConfig()` | Завантажує конфіг з localStorage |
-| `showDashboard()` | Заповнює всі поля форми з siteConfig, рендерить таби |
+| `loadConfig()` | Асинхронно завантажує конфіг: спершу site-data.json з GitHub, потім localStorage, потім дефолти |
+| `showDashboard()` | Заповнює всі поля форми з siteConfig, рендерить всі 5 табів |
 | `switchTab(tabId, btn)` | Перемикає вкладки |
+
+### Відгуки & FAQ (Tab 5)
+| Функція | Призначення |
+|---------|-------------|
+| `renderReviewsTab()` | Рендерить картки відгуків |
+| `addNewReview()` | Додає новий відгук |
+| `renderFaqTab()` | Рендерить картки FAQ |
+| `addNewFaq()` | Додає нове питання |
 
 ### Послуги
 | Функція | Призначення |
@@ -197,6 +224,15 @@ reviews             — DEFAULT_REVIEWS[]
 }
 ```
 
+## Структура DEFAULT_FAQ
+
+```js
+[
+  { "q": "Питання...", "a": "Відповідь..." },
+  ...
+]
+```
+
 ---
 
 ## CSS (десктоп)
@@ -233,17 +269,23 @@ reviews             — DEFAULT_REVIEWS[]
 ## Потік даних
 
 ```
+GitHub API (коли є токен):
+  PUT flora/images/photo_N.jpg  — завантаження фото
+  PUT flora/site-data.json      — публікація конфігу
+  └─ GitHub Pages деплой (~1-2 хв) → зміни видно всім
+
 sessionStorage("admin_authenticated")
   └─ true → showDashboard()
   └─ false → auth screen
 
-localStorage("karina_admin_config")
-  ├─ Читання: loadConfig() → siteConfig
-  └─ Запис: saveSettings() → JSON.stringify(siteConfig)
+localStorage:
+  "karina_admin_config"    — основний конфіг (тексти, послуги, галерея, відгуки, FAQ)
+  "karina_github_settings" — GitHub owner/repo/branch/token
 
 siteConfig
-  ├─ tabNotifications: telegram, viber, phone, email
+  ├─ tabNotifications: telegram, viber, phone, email, github
   ├─ tabServices: services[] + renderServicesTab()
   ├─ tabPhotos: gallery[] + renderPhotosTab()
-  └─ tabContent: heroTitle, heroSubtitle, aboutTitle, aboutLead
+  ├─ tabContent: heroTitle, heroSubtitle, aboutTitle, aboutLead
+  └─ tabReviews: reviews[] + faq[] + renderReviewsTab() + renderFaqTab()
 ```
