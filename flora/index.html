@@ -1161,6 +1161,15 @@
           return alb.includes(targetAlbum) || cat.includes(targetAlbum) || (sIndex === 0 && (cat === 'mk' || alb.includes('майстер')));
         });
 
+        // Якщо в альбомі послуги менше 3 фото — додаємо фото з інших альбомів,
+        // щоб у кожної послуги була міні-галерея (B2B, WOW та ін.)
+        if (servicePhotos.length < 3) {
+          const otherPhotos = (siteConfig.gallery || []).filter(item =>
+            !servicePhotos.includes(item)
+          );
+          servicePhotos = servicePhotos.concat(otherPhotos).slice(0, 4);
+        }
+
         if (serv.photos && serv.photos.length) {
           servicePhotos = serv.photos.map(pUrl => ({ src: pUrl, title: serv.title }));
         }
@@ -1259,7 +1268,7 @@
       var reviews = siteConfig.reviews || DEFAULT_REVIEWS;
       if (!reviews.length) { grid.innerHTML = ""; return; }
       grid.innerHTML = reviews.map(function(r) {
-        return '<div class="review-card reveal"><div class="review-stars">' + "★".repeat(r.stars || 5) + "☆".repeat(5 - (r.stars || 5)) + '</div><p style="color:var(--text-body);font-size:0.95rem;line-height:1.6;margin-bottom:16px;">"' + r.text + '"</p><div style="display:flex;align-items:center;gap:12px;"><img src="' + (r.avatar || '') + '" style="width:48px;height:48px;border-radius:50%;object-fit:cover;background:var(--rose-light);" onerror="this.style.display=\'none\'"><div><div style="font-weight:700;color:var(--text-main);">' + r.name + '</div><div style="font-size:0.82rem;color:var(--text-muted);">' + r.role + '</div></div></div></div>';
+        return '<div class="review-card"><div class="review-stars">' + "★".repeat(r.stars || 5) + "☆".repeat(5 - (r.stars || 5)) + '</div><p style="color:var(--text-body);font-size:0.95rem;line-height:1.6;margin-bottom:16px;">"' + r.text + '"</p><div style="display:flex;align-items:center;gap:12px;"><img src="' + (r.avatar || '') + '" style="width:48px;height:48px;border-radius:50%;object-fit:cover;background:var(--rose-light);" onerror="this.style.display=\'none\'"><div><div style="font-weight:700;color:var(--text-main);">' + r.name + '</div><div style="font-size:0.82rem;color:var(--text-muted);">' + r.role + '</div></div></div></div>';
       }).join("");
     }
 
@@ -1269,7 +1278,7 @@
       const faqs = siteConfig.faq || [];
       if (!faqs.length) { container.innerHTML = ''; return; }
       container.innerHTML = faqs.map(function(f, i) {
-        return '<div class="faq-item reveal">' +
+        return '<div class="faq-item">' +
           '<button class="faq-question" onclick="toggleFAQ(this)">' + f.q + '<span class="faq-icon">＋</span></button>' +
           '<div class="faq-answer"><p>' + f.a + '</p></div>' +
           '</div>';
