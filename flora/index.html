@@ -800,7 +800,7 @@
         <form id="mainContactForm" onsubmit="handleFormSubmit(event)">
           <div class="form-group"><input type="text" id="clientName" placeholder="Ваше ім'я" class="form-input" required></div>
           <div class="form-group"><input type="tel" id="clientPhone" placeholder="Ваш телефон" class="form-input" required></div>
-          <div class="form-group"><select id="serviceSelect" class="form-select"><option value="">Оберіть послугу</option><option value="Майстер-клас">Майстер-клас для дітей та дорослих</option><option value="B2B Навчання">B2B Навчання для магазинів</option><option value="Весільна флористика">Весільна флористика та декор</option><option value="WOW-доставка">WOW-доставка великих букетів</option></select></div>
+          <div class="form-group"><select id="serviceSelect" class="form-select"><option value="">Оберіть послугу</option></select></div>
           <div class="form-group"><textarea id="clientMessage" placeholder="Опишіть ваше замовлення" class="form-textarea" rows="2"></textarea></div>
           <button type="submit" class="btn btn-primary" style="width:100%;">Надіслати заявку 🌸</button>
         </form>
@@ -955,6 +955,7 @@
       renderGalleryAndAlbums();
       renderReviews();
       renderFaq();
+      renderServiceSelect();
     }
 
     async function sendTelegramMessage(text) {
@@ -1270,6 +1271,19 @@
       grid.innerHTML = reviews.map(function(r) {
         return '<div class="review-card"><div class="review-stars">' + "★".repeat(r.stars || 5) + "☆".repeat(5 - (r.stars || 5)) + '</div><p style="color:var(--text-body);font-size:0.95rem;line-height:1.6;margin-bottom:16px;">"' + r.text + '"</p><div style="display:flex;align-items:center;gap:12px;"><img src="' + (r.avatar || '') + '" style="width:48px;height:48px;border-radius:50%;object-fit:cover;background:var(--rose-light);" onerror="this.style.display=\'none\'"><div><div style="font-weight:700;color:var(--text-main);">' + r.name + '</div><div style="font-size:0.82rem;color:var(--text-muted);">' + r.role + '</div></div></div></div>';
       }).join("");
+    }
+
+    function renderServiceSelect() {
+      const select = document.getElementById('serviceSelect');
+      if (!select) return;
+      const services = siteConfig.services || [];
+      const currentVal = select.value;
+      select.innerHTML = '<option value="">Оберіть послугу</option>' + services.map(s =>
+        '<option value="' + (s.title || '') + '">' + (s.title || 'Без назви') + '</option>'
+      ).join('');
+      if (currentVal && Array.from(select.options).some(o => o.value === currentVal)) {
+        select.value = currentVal;
+      }
     }
 
     function renderFaq() {

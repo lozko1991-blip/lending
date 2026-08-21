@@ -361,6 +361,29 @@
         <label class="form-label">Текст "Про мене"</label>
         <textarea id="cfgAboutLead" class="form-textarea" rows="3"></textarea>
       </div>
+      <h3 style="font-size: 1.3rem; margin-top: 24px; margin-bottom: 16px;">📷 Фото Hero та "Про мене"</h3>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Головне фото (Hero)</label>
+          <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+            <img id="heroPhotoPreview" src="" style="width:90px; height:90px; object-fit:cover; border-radius:10px; border:1px solid var(--rose-light); background:#F7EBEF;">
+            <label class="btn btn-outline btn-sm" style="cursor:pointer;">
+              📷 Замінити фото
+              <input type="file" accept="image/*" style="display:none;" onchange="uploadHeroPhoto(this)">
+            </label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Фото "Про мене"</label>
+          <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+            <img id="aboutPhotoPreview" src="" style="width:90px; height:90px; object-fit:cover; border-radius:10px; border:1px solid var(--rose-light); background:#F7EBEF;">
+            <label class="btn btn-outline btn-sm" style="cursor:pointer;">
+              📷 Замінити фото
+              <input type="file" accept="image/*" style="display:none;" onchange="uploadAboutPhoto(this)">
+            </label>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- TAB 5: REVIEWS & FAQ -->
@@ -486,10 +509,35 @@
       document.getElementById('cfgGithubRepo').value = gh.repo || 'lending';
       document.getElementById('cfgGithubBranch').value = gh.branch || 'main';
 
+      const heroPrev = document.getElementById('heroPhotoPreview');
+      const aboutPrev = document.getElementById('aboutPhotoPreview');
+      if (heroPrev) heroPrev.src = siteConfig.heroPhoto || '';
+      if (aboutPrev) aboutPrev.src = siteConfig.aboutPhoto || '';
+
       renderServicesTab();
       renderPhotosTab();
       renderReviewsTab();
       renderFaqTab();
+    }
+
+    function uploadHeroPhoto(inputElem) {
+      if (inputElem.files && inputElem.files[0]) {
+        optimizeAndUploadImage(inputElem.files[0], function(dataUrl) {
+          siteConfig.heroPhoto = dataUrl;
+          document.getElementById('heroPhotoPreview').src = dataUrl;
+          alert('Головне фото Hero оновлено! Натисніть "Зберегти та Застосувати", щоб опублікувати.');
+        });
+      }
+    }
+
+    function uploadAboutPhoto(inputElem) {
+      if (inputElem.files && inputElem.files[0]) {
+        optimizeAndUploadImage(inputElem.files[0], function(dataUrl) {
+          siteConfig.aboutPhoto = dataUrl;
+          document.getElementById('aboutPhotoPreview').src = dataUrl;
+          alert('Фото "Про мене" оновлено! Натисніть "Зберегти та Застосувати", щоб опублікувати.');
+        });
+      }
     }
 
     function switchTab(tabId, btnElem) {
@@ -671,7 +719,17 @@
               ${[1,2,3,4,5].map(s => `<option value="${s}" ${(rev.stars||5)===s?'selected':''}>${s} ${'★'.repeat(s)}</option>`).join('')}
             </select>
           </div>
-          <div class="form-group"><label class="form-label">URL аватара (опціонально)</label><input type="text" class="form-input" value="${rev.avatar && !rev.avatar.startsWith('data:') ? rev.avatar : ''}" placeholder="https://... або порожньо" onchange="siteConfig.reviews[${i}].avatar=this.value"></div>
+          <div class="form-group">
+            <label class="form-label">Аватар клієнта</label>
+            <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+              <img src="${rev.avatar || ''}" style="width:48px; height:48px; border-radius:50%; object-fit:cover; background:var(--bg-blush);" onerror="this.style.visibility='hidden'">
+              <label class="btn btn-outline btn-sm" style="cursor:pointer;">
+                📷 Завантажити
+                <input type="file" accept="image/*" style="display:none;" onchange="uploadReviewAvatar(${i}, this)">
+              </label>
+              <input type="text" class="form-input" style="flex:1; min-width:180px;" value="${rev.avatar && !rev.avatar.startsWith('data:') ? rev.avatar : ''}" placeholder="або вставте URL" onchange="siteConfig.reviews[${i}].avatar=this.value">
+            </div>
+          </div>
         `;
         container.appendChild(card);
       });
@@ -681,6 +739,16 @@
       if (!siteConfig.reviews) siteConfig.reviews = [];
       siteConfig.reviews.push({ id: 'r' + Date.now(), name: "Новий клієнт", role: "Клієнт", text: "Текст відгуку...", stars: 5, avatar: "" });
       renderReviewsTab();
+    }
+
+    function uploadReviewAvatar(index, inputElem) {
+      if (inputElem.files && inputElem.files[0]) {
+        optimizeAndUploadImage(inputElem.files[0], function(dataUrl) {
+          siteConfig.reviews[index].avatar = dataUrl;
+          renderReviewsTab();
+          alert('Аватар оновлено! Натисніть "Зберегти та Застосувати", щоб опублікувати.');
+        });
+      }
     }
 
     function renderFaqTab() {
@@ -816,6 +884,14 @@
       if (siteConfig.aboutPhoto && siteConfig.aboutPhoto.startsWith('data:image/')) {
         const url = await githubUploadImage(gh, siteConfig.aboutPhoto, 'about_' + Date.now() + '.jpg');
         if (url) siteConfig.aboutPhoto = url;
+      }
+      // Аватари відгуків
+      const reviews = siteConfig.reviews || [];
+      for (let i = 0; i < reviews.length; i++) {
+        if (reviews[i].avatar && reviews[i].avatar.startsWith('data:image/')) {
+          const url = await githubUploadImage(gh, reviews[i].avatar, 'avatar_' + Date.now() + '_' + i + '.jpg');
+          if (url) reviews[i].avatar = url;
+        }
       }
     }
 
