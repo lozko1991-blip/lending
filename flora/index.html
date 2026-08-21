@@ -599,6 +599,39 @@
       transform: rotate(45deg);
     }
 
+    /* ===== МОДУЛЬ: ЦИФРИ / СТАТИСТИКА ===== */
+    .stats-section { background: var(--rose-deep); }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 24px; text-align: center; }
+    .stat-card { padding: 10px; }
+    .stat-number { font-family: var(--font-heading); font-size: clamp(2.6rem, 5vw, 3.8rem); font-weight: 700; color: #FFFFFF; line-height: 1.1; }
+    .stat-label { color: rgba(255, 255, 255, 0.88); font-size: 0.95rem; margin-top: 8px; }
+
+    /* ===== МОДУЛЬ: ТАРИФИ ===== */
+    .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 26px; align-items: stretch; max-width: 1020px; margin: 0 auto; }
+    .price-card { position: relative; background: var(--bg-card); border: 1px solid var(--rose-light); border-radius: var(--radius-lg); padding: 38px 28px 32px; box-shadow: var(--shadow-card); display: flex; flex-direction: column; transition: var(--transition); }
+    .price-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-hover); }
+    .price-card.highlight { border-color: var(--rose-medium); box-shadow: 0 16px 40px rgba(var(--accent-rgb), 0.18); }
+    .price-badge { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, var(--rose-deep), var(--rose-dark)); color: #FFFFFF; font-size: 0.72rem; font-weight: 700; padding: 6px 18px; border-radius: 50px; letter-spacing: 1px; white-space: nowrap; }
+    .price-name { font-family: var(--font-heading); font-size: 1.5rem; font-weight: 600; color: var(--text-main); margin-bottom: 12px; }
+    .price-value { font-family: var(--font-heading); font-size: 2.4rem; font-weight: 700; color: var(--rose-dark); line-height: 1.15; }
+    .price-note { font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; }
+    .price-features { list-style: none; margin: 20px 0 0; padding: 20px 0 0; border-top: 1px dashed var(--rose-light); display: flex; flex-direction: column; gap: 10px; flex: 1; }
+    .price-features li { font-size: 0.92rem; color: var(--text-body); padding-left: 26px; position: relative; }
+    .price-features li::before { content: '✓'; position: absolute; left: 2px; color: var(--rose-deep); font-weight: 700; }
+
+    /* ===== МОДУЛЬ: КРОКИ РОБОТИ ===== */
+    .steps-section { background: var(--bg-warm); }
+    .steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; max-width: 1080px; margin: 0 auto; }
+    .step-card { text-align: center; padding: 10px 6px; }
+    .step-num { width: 58px; height: 58px; margin: 0 auto 16px; border-radius: 50%; background: linear-gradient(135deg, var(--rose-deep), var(--rose-dark)); color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: var(--font-heading); font-size: 1.6rem; font-weight: 700; box-shadow: 0 8px 20px rgba(var(--accent-rgb), 0.3); }
+    .step-card h4 { font-family: var(--font-heading); font-size: 1.25rem; color: var(--text-main); margin-bottom: 8px; }
+    .step-card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.65; }
+
+    /* ===== МОДУЛЬ: КАРТА ===== */
+    .map-wrap { max-width: 1020px; margin: 0 auto; border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-card); height: 420px; background: var(--bg-blush); }
+    .map-wrap iframe { width: 100%; height: 100%; border: 0; display: block; }
+    .map-empty { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+
 </style>
 </head>
 <body>
@@ -793,6 +826,36 @@
     </div>
   </section>
 
+  <!-- STATS MODULE -->
+  <section class="section stats-section" id="stats">
+    <div class="container">
+      <div class="stats-grid" id="dynamicStatsGrid"></div>
+    </div>
+  </section>
+
+  <!-- PRICING MODULE -->
+  <section class="section" id="pricing">
+    <div class="container">
+      <div class="section-header" id="pricingHeader"></div>
+      <div class="pricing-grid" id="dynamicPricingGrid"></div>
+    </div>
+  </section>
+
+  <!-- STEPS MODULE -->
+  <section class="section steps-section" id="steps">
+    <div class="container">
+      <div class="section-header" id="stepsHeader"></div>
+      <div class="steps-grid" id="dynamicStepsGrid"></div>
+    </div>
+  </section>
+
+  <!-- MAP MODULE -->
+  <section class="section" id="map">
+    <div class="container">
+      <div class="map-wrap" id="mapEmbedWrap"></div>
+    </div>
+  </section>
+
   <!-- CONTACT SECTION -->
   <section class="section contact-section" id="contact">
     <div class="container contact-grid">
@@ -856,6 +919,36 @@
       gallery: DEFAULT_GALLERY,
       reviews: DEFAULT_REVIEWS,
       faq: DEFAULT_FAQ,
+      stats: {
+        items: [
+          { number: '5+', label: 'років досвіду' },
+          { number: '500+', label: 'щасливих клієнтів' },
+          { number: '1200+', label: 'створених робіт' },
+          { number: '98%', label: 'клієнтів повертаються' }
+        ]
+      },
+      pricing: {
+        subtitleTag: 'Ціни',
+        title: 'Наші тарифи',
+        description: 'Прозорі умови без прихованих платежів',
+        items: [
+          { name: 'Базовий', price: 'від 1 000 грн', note: '', features: 'Консультація та концепція\nБазове оформлення\nДоставка по місту', highlight: false },
+          { name: 'Стандарт', price: 'від 2 500 грн', note: 'Найпопулярніший', features: 'Усе з тарифу Базовий\nРозширене оформлення\nІндивідуальні побажання', highlight: true },
+          { name: 'Преміум', price: 'від 5 000 грн', note: '', features: 'Усе з тарифу Стандарт\nПреміум матеріали\nПерсональний менеджер', highlight: false }
+        ]
+      },
+      steps: {
+        subtitleTag: 'Процес',
+        title: 'Як ми працюємо',
+        description: '',
+        items: [
+          { title: 'Заявка', text: 'Ви залишаєте заявку на сайті або телефонуєте нам' },
+          { title: 'Обговорення', text: 'Уточнюємо деталі, побажання та бюджет проєкту' },
+          { title: 'Реалізація', text: 'Втілюємо задум та узгоджуємо кожну правку' },
+          { title: 'Результат', text: 'Ви отримуєте готовий результат точно в строк' }
+        ]
+      },
+      map: { embedUrl: '' },
       theme: {
         preset: 'flora',
         bgIvory: '#FAF6F3',
@@ -1005,6 +1098,10 @@
       renderReviews();
       renderFaq();
       renderServiceSelect();
+      renderStats();
+      renderPricing();
+      renderSteps();
+      renderMap();
 
       applyTheme();
       applyModules();
@@ -1371,44 +1468,102 @@
     }
 
     // ===== МОДУЛІ (секції: порядок + увімкнення з конфігу) =====
-    const DEFAULT_MODULE_ORDER = ['hero', 'about', 'services', 'portfolio', 'reviews', 'faq', 'contact'];
+    const DEFAULT_MODULE_ORDER = ['hero', 'about', 'services', 'portfolio', 'reviews', 'faq', 'contact', 'stats', 'pricing', 'steps', 'map'];
 
     function applyModules() {
-      let order = DEFAULT_MODULE_ORDER;
-      if (Array.isArray(siteConfig.modules) && siteConfig.modules.length) {
-        order = siteConfig.modules.filter(function(id) { return document.getElementById(id); });
-        // Додаємо секції, які є в DOM але не в конфігу (сумісність)
-        DEFAULT_MODULE_ORDER.forEach(function(id) {
-          if (!order.includes(id)) order.push(id);
-        });
-      }
+      const configured = Array.isArray(siteConfig.modules) && siteConfig.modules.length
+        ? siteConfig.modules.filter(function(id) { return document.getElementById(id); })
+        : DEFAULT_MODULE_ORDER.slice();
 
       const footer = document.querySelector('footer');
-      const enabled = [];
 
-      // Переставляємо активні секції в заданому порядку (безпосередньо перед footer)
-      order.forEach(function(id) {
+      // Показуємо та переставляємо активні секції в заданому порядку (перед footer)
+      configured.forEach(function(id) {
         const el = document.getElementById(id);
         if (!el) return;
-        enabled.push(id);
         el.style.display = '';
-        if (footer && footer.parentElement === el.parentElement && footer !== el.nextElementSibling) {
+        if (footer && footer.parentElement === el.parentElement && el.nextElementSibling !== footer) {
           try { footer.parentElement.insertBefore(el, footer); } catch(e) {}
         }
       });
 
-      // Ховаємо вимкнені
+      // Ховаємо відомі секції, яких немає в конфігу
       DEFAULT_MODULE_ORDER.forEach(function(id) {
+        if (configured.includes(id)) return;
         const el = document.getElementById(id);
-        if (el && !enabled.includes(id)) el.style.display = 'none';
+        if (el) el.style.display = 'none';
       });
 
-      // Синхронізуємо навігацію (ховаємо лінки на вимкнені секції)
+      // Синхронізуємо навігацію
       ['about', 'services', 'portfolio', 'reviews', 'faq', 'contact'].forEach(function(id) {
         document.querySelectorAll('a[href="#' + id + '"]').forEach(function(a) {
-          a.style.display = enabled.includes(id) ? '' : 'none';
+          a.style.display = configured.includes(id) ? '' : 'none';
         });
       });
+    }
+
+    function escHtml(s) {
+      return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function renderStats() {
+      const grid = document.getElementById('dynamicStatsGrid');
+      if (!grid) return;
+      const items = (siteConfig.stats && siteConfig.stats.items) || [];
+      grid.innerHTML = items.map(function(it) {
+        return '<div class="stat-card"><div class="stat-number">' + escHtml(it.number) + '</div><div class="stat-label">' + escHtml(it.label) + '</div></div>';
+      }).join('');
+    }
+
+    function renderPricing() {
+      const head = document.getElementById('pricingHeader');
+      const grid = document.getElementById('dynamicPricingGrid');
+      if (!grid) return;
+      const p = siteConfig.pricing || {};
+      if (head) {
+        head.innerHTML =
+          (p.subtitleTag ? '<div class="section-subtitle-tag">' + escHtml(p.subtitleTag) + '</div>' : '') +
+          (p.title ? '<h2 class="section-title">' + escHtml(p.title) + '</h2>' : '') +
+          (p.description ? '<p class="section-description">' + escHtml(p.description) + '</p>' : '');
+      }
+      const items = p.items || [];
+      grid.innerHTML = items.map(function(c) {
+        const feats = String(c.features || '').split('\n').filter(function(x){ return x.trim(); })
+          .map(function(f){ return '<li>' + escHtml(f.trim()) + '</li>'; }).join('');
+        return '<div class="price-card' + (c.highlight ? ' highlight' : '') + '">' +
+          (c.highlight ? '<div class="price-badge">Популярний</div>' : '') +
+          '<div class="price-name">' + escHtml(c.name) + '</div>' +
+          '<div class="price-value">' + escHtml(c.price) + '</div>' +
+          (c.note ? '<div class="price-note">' + escHtml(c.note) + '</div>' : '') +
+          (feats ? '<ul class="price-features">' + feats + '</ul>' : '') +
+          '</div>';
+      }).join('');
+    }
+
+    function renderSteps() {
+      const head = document.getElementById('stepsHeader');
+      const grid = document.getElementById('dynamicStepsGrid');
+      if (!grid) return;
+      const s = siteConfig.steps || {};
+      if (head) {
+        head.innerHTML =
+          (s.subtitleTag ? '<div class="section-subtitle-tag">' + escHtml(s.subtitleTag) + '</div>' : '') +
+          (s.title ? '<h2 class="section-title">' + escHtml(s.title) + '</h2>' : '') +
+          (s.description ? '<p class="section-description">' + escHtml(s.description) + '</p>' : '');
+      }
+      const items = s.items || [];
+      grid.innerHTML = items.map(function(st, i) {
+        return '<div class="step-card"><div class="step-num">' + (i + 1) + '</div>' +
+          '<h4>' + escHtml(st.title) + '</h4><p>' + escHtml(st.text) + '</p></div>';
+      }).join('');
+    }
+
+    function renderMap() {
+      const wrap = document.getElementById('mapEmbedWrap');
+      if (!wrap) return;
+      const u = (siteConfig.map && siteConfig.map.embedUrl) || '';
+      if (!u) { wrap.innerHTML = '<p class="map-empty">Карта не налаштована — додайте посилання в адмінці</p>'; return; }
+      wrap.innerHTML = '<iframe src="' + escHtml(u) + '" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>';
     }
 
     function renderServiceSelect() {

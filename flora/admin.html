@@ -370,6 +370,36 @@
       <h3 style="font-size: 1.4rem; margin-top: 30px; margin-bottom: 6px;">🧩 Модулі сайту</h3>
       <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 14px;">Увімкніть потрібні секції та задайте їхній порядок на сторінці (стрілками ↑ ↓).</p>
       <div id="modulesContainer"></div>
+
+      <h3 style="font-size: 1.4rem; margin-top: 34px; margin-bottom: 6px;">📊 Контент модуля «Цифри»</h3>
+      <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 12px;">Велика рожева смуга з числами. Спершу увімкніть модуль у списку вище.</p>
+      <div id="adminStatsItems"></div>
+      <button type="button" class="btn btn-primary btn-sm" onclick="addStatItem()" style="margin:10px 0;">+ Додати цифру</button>
+
+      <h3 style="font-size: 1.4rem; margin-top: 34px; margin-bottom: 6px;">💰 Контент модуля «Тарифи»</h3>
+      <div class="grid-2">
+        <div class="form-group"><label class="form-label">Мітка зверху</label><input type="text" id="prTag" class="form-input"></div>
+        <div class="form-group"><label class="form-label">Заголовок</label><input type="text" id="prTitle" class="form-input"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Опис під заголовком</label><textarea id="prDesc" class="form-textarea" rows="2"></textarea></div>
+      <div id="adminPricingItems"></div>
+      <button type="button" class="btn btn-primary btn-sm" onclick="addPricingItem()" style="margin:10px 0;">+ Додати тариф</button>
+
+      <h3 style="font-size: 1.4rem; margin-top: 34px; margin-bottom: 6px;">📋 Контент модуля «Як ми працюємо»</h3>
+      <div class="grid-2">
+        <div class="form-group"><label class="form-label">Мітка зверху</label><input type="text" id="stTag" class="form-input"></div>
+        <div class="form-group"><label class="form-label">Заголовок</label><input type="text" id="stTitle" class="form-input"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Опис під заголовком</label><textarea id="stDesc" class="form-textarea" rows="2"></textarea></div>
+      <div id="adminStepsItems"></div>
+      <button type="button" class="btn btn-primary btn-sm" onclick="addStepItem()" style="margin:10px 0;">+ Додати крок</button>
+
+      <h3 style="font-size: 1.4rem; margin-top: 34px; margin-bottom: 6px;">🗺 Модуль «Карта»</h3>
+      <div class="form-group">
+        <label class="form-label">Google Maps Embed URL</label>
+        <input type="text" id="cfgMapEmbed" class="form-input" placeholder="https://www.google.com/maps/embed?pb=...">
+      </div>
+      <p style="font-size:0.82rem; color:var(--text-muted);">Як отримати: відкрийте Google Maps → знайдіть адресу → «Поділитися» → «Вбудувати карту» → скопіюйте посилання з атрибута src.</p>
     </div>
 
     <!-- TAB 3: SERVICES (PRODUCTS) -->
@@ -498,7 +528,37 @@
       services: DEFAULT_SERVICES,
       gallery: DEFAULT_GALLERY,
       reviews: DEFAULT_REVIEWS,
-      faq: DEFAULT_FAQ
+      faq: DEFAULT_FAQ,
+      stats: {
+        items: [
+          { number: '5+', label: 'років досвіду' },
+          { number: '500+', label: 'щасливих клієнтів' },
+          { number: '1200+', label: 'створених робіт' },
+          { number: '98%', label: 'клієнтів повертаються' }
+        ]
+      },
+      pricing: {
+        subtitleTag: 'Ціни',
+        title: 'Наші тарифи',
+        description: 'Прозорі умови без прихованих платежів',
+        items: [
+          { name: 'Базовий', price: 'від 1 000 грн', note: '', features: 'Консультація та концепція\nБазове оформлення\nДоставка по місту', highlight: false },
+          { name: 'Стандарт', price: 'від 2 500 грн', note: 'Найпопулярніший', features: 'Усе з тарифу Базовий\nРозширене оформлення\nІндивідуальні побажання', highlight: true },
+          { name: 'Преміум', price: 'від 5 000 грн', note: '', features: 'Усе з тарифу Стандарт\nПреміум матеріали\nПерсональний менеджер', highlight: false }
+        ]
+      },
+      steps: {
+        subtitleTag: 'Процес',
+        title: 'Як ми працюємо',
+        description: '',
+        items: [
+          { title: 'Заявка', text: 'Ви залишаєте заявку на сайті або телефонуєте нам' },
+          { title: 'Обговорення', text: 'Уточнюємо деталі, побажання та бюджет проєкту' },
+          { title: 'Реалізація', text: 'Втілюємо задум та узгоджуємо кожну правку' },
+          { title: 'Результат', text: 'Ви отримуєте готовий результат точно в строк' }
+        ]
+      },
+      map: { embedUrl: '' }
     };
 
     let siteConfig = { ...DEFAULT_CONFIG };
@@ -550,8 +610,12 @@
       { id: 'about', label: '👤 Про мене / Про компанію' },
       { id: 'services', label: '🛍 Послуги / Пропозиції' },
       { id: 'portfolio', label: '🖼 Галерея / Портфоліо' },
+      { id: 'stats', label: '📊 Цифри / Статистика' },
+      { id: 'pricing', label: '💰 Тарифи / Ціни' },
+      { id: 'steps', label: '📋 Як ми працюємо (кроки)' },
       { id: 'reviews', label: '💬 Відгуки клієнтів' },
       { id: 'faq', label: '❓ Поширені питання' },
+      { id: 'map', label: '🗺 Карта (Google Maps)' },
       { id: 'contact', label: '📞 Контакти та форма заявки', locked: true }
     ];
 
@@ -594,11 +658,13 @@
       MODULE_LIST.forEach(function(m) {
         modulesState.push({ id: m.id, enabled: savedOrder.includes(m.id), locked: !!m.locked });
       });
-      // Сортуємо за збереженим порядком
+      // Сортуємо за збереженим порядком (невідомі — в кінець)
       modulesState.sort(function(a, b) {
-        return savedOrder.indexOf(a.id) - savedOrder.indexOf(b.id);
+        const ia = savedOrder.indexOf(a.id); const ib = savedOrder.indexOf(b.id);
+        return (ia < 0 ? 999 : ia) - (ib < 0 ? 999 : ib);
       });
       renderModulesTab();
+      renderContentModuleEditors();
     }
 
     function fillDesignForm() {
@@ -661,6 +727,98 @@
 
     function collectEnabledModules() {
       return modulesState.filter(function(m) { return m.enabled; }).map(function(m) { return m.id; });
+    }
+
+    // ===== РЕДАКТОРИ КОНТЕНТУ НОВИХ МОДУЛІВ =====
+    function escAttr(s) {
+      return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function renderContentModuleEditors() {
+      renderStatsItems();
+      renderPricingItems();
+      renderStepsItems();
+      fillModuleHeaders();
+    }
+
+    function fillModuleHeaders() {
+      const p = siteConfig.pricing || {};
+      const s = siteConfig.steps || {};
+      const set = function(id, v) { const el = document.getElementById(id); if (el) el.value = v || ''; };
+      set('prTag', p.subtitleTag); set('prTitle', p.title); set('prDesc', p.description);
+      set('stTag', s.subtitleTag); set('stTitle', s.title); set('stDesc', s.description);
+      set('cfgMapEmbed', siteConfig.map && siteConfig.map.embedUrl);
+    }
+
+    function renderStatsItems() {
+      const c = document.getElementById('adminStatsItems');
+      if (!c) return;
+      if (!siteConfig.stats) siteConfig.stats = { items: [] };
+      if (!Array.isArray(siteConfig.stats.items)) siteConfig.stats.items = [];
+      c.innerHTML = siteConfig.stats.items.map(function(it, i) {
+        return '<div class="card-item" style="display:flex; gap:12px; align-items:flex-end; margin-bottom:10px;">' +
+          '<div class="form-group" style="flex:0 0 150px; margin:0;"><label class="form-label">Число</label>' +
+          '<input type="text" class="form-input" value="' + escAttr(it.number) + '" onchange="siteConfig.stats.items[' + i + '].number=this.value"></div>' +
+          '<div class="form-group" style="flex:1; margin:0;"><label class="form-label">Підпис</label>' +
+          '<input type="text" class="form-input" value="' + escAttr(it.label) + '" onchange="siteConfig.stats.items[' + i + '].label=this.value"></div>' +
+          '<button type="button" class="btn btn-danger btn-sm" onclick="siteConfig.stats.items.splice(' + i + ',1); renderStatsItems();">✕</button></div>';
+      }).join('');
+    }
+
+    function addStatItem() {
+      if (!siteConfig.stats) siteConfig.stats = { items: [] };
+      siteConfig.stats.items.push({ number: '100+', label: 'новий показник' });
+      renderStatsItems();
+    }
+
+    function renderPricingItems() {
+      const c = document.getElementById('adminPricingItems');
+      if (!c) return;
+      if (!siteConfig.pricing) siteConfig.pricing = { items: [] };
+      if (!Array.isArray(siteConfig.pricing.items)) siteConfig.pricing.items = [];
+      c.innerHTML = siteConfig.pricing.items.map(function(it, i) {
+        return '<div class="card-item" style="margin-bottom:12px;">' +
+          '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">' +
+          '<strong>Тариф #' + (i + 1) + '</strong>' +
+          '<button type="button" class="btn btn-danger btn-sm" onclick="siteConfig.pricing.items.splice(' + i + ',1); renderPricingItems();">Видалити</button></div>' +
+          '<div class="grid-2">' +
+          '<div class="form-group"><label class="form-label">Назва тарифу</label><input type="text" class="form-input" value="' + escAttr(it.name) + '" onchange="siteConfig.pricing.items[' + i + '].name=this.value"></div>' +
+          '<div class="form-group"><label class="form-label">Ціна</label><input type="text" class="form-input" value="' + escAttr(it.price) + '" onchange="siteConfig.pricing.items[' + i + '].price=this.value"></div>' +
+          '</div>' +
+          '<div class="form-group"><label class="form-label">Нотатка під ціною</label><input type="text" class="form-input" value="' + escAttr(it.note) + '" onchange="siteConfig.pricing.items[' + i + '].note=this.value"></div>' +
+          '<div class="form-group"><label class="form-label">Що включено (кожен пункт з нового рядка)</label>' +
+          '<textarea class="form-textarea" rows="3" onchange="siteConfig.pricing.items[' + i + '].features=this.value">' + escAttr(it.features) + '</textarea></div>' +
+          '<div class="form-group"><label class="form-label"><input type="checkbox" ' + (it.highlight ? 'checked' : '') + ' onchange="siteConfig.pricing.items[' + i + '].highlight=this.checked"> Виділити як «Популярний»</label></div>' +
+          '</div>';
+      }).join('');
+    }
+
+    function addPricingItem() {
+      if (!siteConfig.pricing) siteConfig.pricing = { items: [] };
+      siteConfig.pricing.items.push({ name: 'Новий тариф', price: 'від 1 000 грн', note: '', features: 'Пункт послуги\nДругий пункт', highlight: false });
+      renderPricingItems();
+    }
+
+    function renderStepsItems() {
+      const c = document.getElementById('adminStepsItems');
+      if (!c) return;
+      if (!siteConfig.steps) siteConfig.steps = { items: [] };
+      if (!Array.isArray(siteConfig.steps.items)) siteConfig.steps.items = [];
+      c.innerHTML = siteConfig.steps.items.map(function(it, i) {
+        return '<div class="card-item" style="margin-bottom:12px;">' +
+          '<div style="display:flex; justify-content:flex-end; margin-bottom:6px;">' +
+          '<button type="button" class="btn btn-danger btn-sm" onclick="siteConfig.steps.items.splice(' + i + ',1); renderStepsItems();">Видалити крок</button></div>' +
+          '<div class="grid-2">' +
+          '<div class="form-group"><label class="form-label">Крок ' + (i + 1) + ' — назва</label><input type="text" class="form-input" value="' + escAttr(it.title) + '" onchange="siteConfig.steps.items[' + i + '].title=this.value"></div>' +
+          '<div class="form-group"><label class="form-label">Опис кроку</label><input type="text" class="form-input" value="' + escAttr(it.text) + '" onchange="siteConfig.steps.items[' + i + '].text=this.value"></div>' +
+          '</div></div>';
+      }).join('');
+    }
+
+    function addStepItem() {
+      if (!siteConfig.steps) siteConfig.steps = { items: [] };
+      siteConfig.steps.items.push({ title: 'Новий крок', text: 'Опис дій на цьому кроці' });
+      renderStepsItems();
     }
 
     async function loadConfig() {
