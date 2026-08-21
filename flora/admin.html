@@ -233,6 +233,47 @@
     </div>
   </div>
 
+  <!-- WIZARD: створення нового лендінгу за нішою -->
+  <div id="wizardScreen" class="admin-container" style="display:none; max-width:760px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:12px;">
+      <h1 style="font-size: 2rem;">🧙 Новий лендінг за 2 хвилини</h1>
+      <button type="button" class="btn btn-outline btn-sm" onclick="cancelWizard()">✕ Скасувати</button>
+    </div>
+
+    <!-- Крок 1: ніч -->
+    <div id="wizStep1">
+      <h3 style="margin-bottom:6px;">Крок 1 з 3 — Оберіть нішу клієнта</h3>
+      <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:18px;">Підтянеться готова тема, тексти професійного копірайтингу, послуги, тарифи та FAQ під цю нішу.</p>
+      <div id="wizNicheCards" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:14px;"></div>
+    </div>
+
+    <!-- Крок 2: дані клієнта -->
+    <div id="wizStep2" style="display:none;">
+      <h3 style="margin-bottom:6px;">Крок 2 з 3 — Дані клієнта</h3>
+      <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:18px;">Це буде на сайті одразу після публікації.</p>
+      <div class="form-group"><label class="form-label">Назва компанії * (стане логотипом)</label><input type="text" id="wzCompany" class="form-input" placeholder="БудМонтаж"></div>
+      <div class="grid-2">
+        <div class="form-group"><label class="form-label">Телефон *</label><input type="tel" id="wzPhone" class="form-input" placeholder="+38 (0XX) XXX-XX-XX"></div>
+        <div class="form-group"><label class="form-label">Місто (опціонально)</label><input type="text" id="wzCity" class="form-input" placeholder="Київ"></div>
+      </div>
+      <div style="display:flex; gap:12px; margin-top:20px;">
+        <button type="button" class="btn btn-outline" onclick="wizardGoto(1)">← Назад</button>
+        <button type="button" class="btn btn-primary" onclick="wizardGoto(3)">Далі →</button>
+      </div>
+    </div>
+
+    <!-- Крок 3: огляд і запуск -->
+    <div id="wizStep3" style="display:none;">
+      <h3 style="margin-bottom:6px;">Крок 3 з 3 — Перевірте і запустіть</h3>
+      <div id="wizSummary" class="card-item" style="margin:16px 0;"></div>
+      <p style="color:var(--text-muted); font-size:0.88rem;">Після публікації ви потрапите в адмінку — можна редагувати будь-який текст чи фото. Флористичні фото-заглушки в галереї замініть фото клієнта.</p>
+      <div style="display:flex; gap:12px; margin-top:20px;">
+        <button type="button" class="btn btn-outline" onclick="wizardGoto(2)">← Назад</button>
+        <button type="button" class="btn btn-primary" onclick="finishWizard()">🚀 Створити та опублікувати</button>
+      </div>
+    </div>
+  </div>
+
   <div id="dashboardScreen" class="admin-container" style="display: none;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--rose-light);">
       <h1 style="font-size: 2.2rem;">⚙️ Панель Управління Сайтом</h1>
@@ -408,6 +449,12 @@
         <input type="text" id="cfgMapEmbed" class="form-input" placeholder="https://www.google.com/maps/embed?pb=...">
       </div>
       <p style="font-size:0.82rem; color:var(--text-muted);">Як отримати: відкрийте Google Maps → знайдіть адресу → «Поділитися» → «Вбудувати карту» → скопіюйте посилання з атрибута src.</p>
+
+      <div class="card-item" style="margin-top:30px; background:var(--bg-blush); border:1px dashed var(--rose-medium); text-align:center;">
+        <div style="font-weight:700; margin-bottom:6px;">🧙 Створюєте сайт для нового клієнта?</div>
+        <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">Майстер згенерує готовий лендінг за нішою з професійними текстами — вам залишиться замінити фото.</p>
+        <button type="button" class="btn btn-primary btn-sm" onclick="if(confirm('Майстер ПЕРЕЗАПИШЕ весь поточний контент сайту. Продовжити?')) showWizard();">🧙 Запустити майстер нового лендінгу</button>
+      </div>
     </div>
 
     <!-- TAB 3: SERVICES (PRODUCTS) -->
@@ -629,6 +676,146 @@
       { id: 'contact', label: '📞 Контакти та форма заявки', locked: true }
     ];
 
+    // ===== КОНТЕНТ-ПАКИ НІШ (професійний копірайтинг для Wizard) =====
+    // {{COMPANY}}, {{CITY}} — плейсхолдери, замінюються даними з Wizard
+    function phGallery(albums, titles) {
+      return albums.map(function(a, i) {
+        return { src: 'images/photo_' + ((i % 6) + 1) + '.jpg', title: (titles && titles[i]) || ('Приклад фото — замініть на фото клієнта'), cat: a.toLowerCase().replace(/[^a-zа-яїієґ0-9]/gi, ''), albumName: a };
+      });
+    }
+
+    const GENERIC_REVIEWS = [
+      { name: 'Олександр', role: 'Клієнт', text: 'Все виконано в строк, якістю дуже задоволений. Рекомендую!', stars: 5 },
+      { name: 'Марина', role: 'Клієнт', text: 'Уважне ставлення до деталей і прозорі ціни без сюрпризів.', stars: 5 },
+      { name: 'Ігор', role: 'Постійний клієнт', text: 'Звертаюся вже вдруге — якість стабільно висока. Дякую!', stars: 5 }
+    ];
+
+    const NICHE_PACKS = {
+      build: {
+        icon: '🏗', name: 'Будівництво та ремонт',
+        desc: 'Будинки під ключ, ремонти, покрівлі, фундаменти',
+        themeKey: 'builder',
+        modules: ['hero', 'about', 'stats', 'services', 'portfolio', 'steps', 'pricing', 'reviews', 'faq', 'contact'],
+        siteTitle: '{{COMPANY}} — Будівництво домів під ключ та ремонт | {{CITY}}',
+        heroTitle: 'Будуємо <span style="color: var(--rose-deep); font-style: italic;">надійні доми</span>, що стоятимуть десятиліттями',
+        heroSubtitle: 'Повний цикл будівельних робіт: від фундаменту до покрівлі. {{CITY}} та область. Договір, кошторис, гарантія 5 років.',
+        aboutTitle: 'Про нашу команду',
+        aboutLead: 'Понад 10 років будуємо приватні доми та робимо ремонти у {{CITY}}. Своя бригада майстрів — без субпідрядників і затримок.',
+        services: [
+          { tag: 'Популярне', title: 'Будинок під ключ', description: 'Повний цикл: фундамент, стіни, покрівля, інженерні мережі. Здаємо об\u2019єкт із внутрішнім оздобленням.', slogan: '', price: 'від 12 000 грн/м²', priceNote: '', highlight: true, albumName: 'Будинки' },
+          { tag: 'Основа', title: 'Фундамент', description: 'Стрічкові та плитні фундаменти з геодезією, армуванням і гідроізоляцією.', slogan: '', price: 'від 3 500 грн/м³', priceNote: '', highlight: false, albumName: 'Фундамент' },
+          { tag: 'Ремонт', title: 'Капітальний ремонт', description: 'Квартири, офіси, котеджі. Поетапна прийомка робіт із фотофіксацією.', slogan: '', price: 'від 2 800 грн/м²', priceNote: '', highlight: false, albumName: 'Ремонт' },
+          { tag: 'Дахи', title: 'Монтаж покрівлі', description: 'Металочерепиця, м\u2019яка покрівля, водостічні системи, утеплення.', slogan: '', price: 'від 1 900 грн/м²', priceNote: '', highlight: false, albumName: 'Дахи' }
+        ],
+        stats: { items: [
+          { number: '12+', label: 'років на ринку' }, { number: '87', label: 'домів здано «під ключ»' },
+          { number: '40+', label: 'майстрів у команді' }, { number: '5 років', label: 'гарантії за договором' }
+        ]},
+        pricing: { subtitleTag: 'Ціни', title: 'Тарифи будівництва', description: 'Фіксуємо кошторис у договорі — ціна не зросте в процесі.', items: [
+          { name: 'Каркас', price: 'від 8 000 грн/м²', note: '', features: 'Коробка будинку\nПокрівля\nВікна та двері', highlight: false },
+          { name: 'Під ключ', price: 'від 14 000 грн/м²', note: 'Найчастіше обирають', features: 'Усе з тарифу «Каркас»\nІнженерні мережі\nЧорнове оздоблення', highlight: true },
+          { name: 'Люкс', price: 'від 20 000 грн/м²', note: '', features: 'Усе з «Під ключ»\nДизайн-проєкт\nПовне оздоблення', highlight: false }
+        ]},
+        steps: { subtitleTag: 'Процес', title: 'Як ми будуємо', description: '', items: [
+          { title: 'Заявка', text: 'Обговорюємо задачу за телефоном або пишете в месенджер' },
+          { title: 'Виїзд і кошторис', text: 'Заміряємо об\u2019єкт, готуємо детальний кошторис за 2 дні' },
+          { title: 'Договір', text: 'Фіксуємо терміни, етапи та фіксовану вартість' },
+          { title: 'Будівництво', text: 'Робимо роботи з фотозвітом кожного етапу' },
+          { title: 'Здача', text: 'Приймаєте готовий об\u2019єкт, отримуєте гарантію 5 років' }
+        ]},
+        faq: [
+          { q: 'Скільки триває будівництво дому?', a: 'Коробка — 2-4 місяці, під ключ — від 5 місяців залежно від площі та погоди. Точний графік фіксуємо в договорі.' },
+          { q: 'Як відбувається оплата?', a: 'Поетапно, після закриття кожного етапу робіт. Ви платите лише за фактично виконане.' },
+          { q: 'Хто постачає матеріали?', a: 'Ми — за оптовими цінами постачальників, з чеками. Або працюємо з вашими матеріалами — як зручніше.' },
+          { q: 'Яка гарантія?', a: '5 років на всі конструктивні роботи за договором. Усі дефекти усуваємо безкоштовно.' }
+        ],
+        galleryAlbums: ['Будинки', 'Фундамент', 'Ремонт', 'Дахи'],
+        galleryTitles: ['Приклад фото — замініть', 'Приклад фото — замініть', 'Приклад фото — замініть', 'Приклад фото — замініть', 'Приклад фото — замініть', 'Приклад фото — замініть']
+      },
+
+      estate: {
+        icon: '🏡', name: 'Нерухомість / Продаж домів',
+        desc: 'Продаж об\u2019єктів, власна забудова, супровід угод',
+        themeKey: 'estate',
+        modules: ['hero', 'about', 'stats', 'portfolio', 'pricing', 'steps', 'faq', 'map', 'contact'],
+        siteTitle: '{{COMPANY}} — Преміальні будинки та нерухомість | {{CITY}}',
+        heroTitle: 'Продаж <span style="color: var(--rose-deep); font-style: italic;">преміальних домів</span>, у які хочеться повертатися',
+        heroSubtitle: 'Власна забудова та добір найкращих об\u2019єктів у {{CITY}}. Юридична перевірка кожного дому, супровід угоди під ключ.',
+        aboutTitle: 'Про компанію',
+        aboutLead: 'Ми поєднуємо забудову та продаж нерухомості: знаємо кожен наш будинок від фундаменту до даху й відповідаємо за якість особисто.',
+        services: [
+          { tag: 'Готові доми', title: 'Продаж будинків', description: 'Власна забудова у найкращих локаціях. Показ у будь-який день, повний пакет документів.', slogan: '', price: 'від $45 000', priceNote: '', highlight: true, albumName: 'Об\u2019єкти' },
+          { tag: 'Під замовлення', title: 'Будівництво на вашу ділянку', description: 'Спроєктуємо та збудуємо дім вашої мрії на власній ділянці.', slogan: '', price: 'від 12 000 грн/м²', priceNote: '', highlight: false, albumName: 'Об\u2019єкти' },
+          { tag: 'Ділянки', title: 'Підбір ділянки', description: 'Перевірені ділянки під забудову з комунікаціями та гарними подъїздами.', slogan: '', price: 'безкоштовно', priceNote: 'для покупців наших домів', highlight: false, albumName: 'Локації' },
+          { tag: 'Юридично', title: 'Супровід угоди', description: 'Перевірка документів, нотаріус, реєстрація права власності.', slogan: '', price: 'від 1,5%', priceNote: 'від вартості об\u2019єкта', highlight: false, albumName: 'Локації' }
+        ],
+        stats: { items: [
+          { number: '150+', label: 'проданих об\u2019єктів' }, { number: '12', label: 'років на ринку нерухомості' },
+          { number: '30', label: 'днів — середній термін продажу' }, { number: '0', label: 'проблемних угод за весь час' }
+        ]},
+        pricing: { subtitleTag: 'Послуги', title: 'Вартість співпраці', description: 'Оплата після результату — коли ви вже власник.', items: [
+          { name: 'Консультація', price: 'безкоштовно', note: '', features: 'Оцінка потреб\nПідбір варіантів\nВідповіді на питання', highlight: false },
+          { name: 'Продаж об\u2019єкта', price: 'від 2%', note: 'від вартості', features: 'Профі фото та опис\nРеклама на площадках\nПокази та переговори', highlight: true },
+          { name: 'Супровід покупки', price: 'від 1,5%', note: 'від вартості', features: 'Перевірка документів\nНотаріус і реєстрація\nПередача об\u2019єкта', highlight: false }
+        ]},
+        steps: { subtitleTag: 'Як це працює', title: 'Шлях до вашого дому', description: '', items: [
+          { title: 'Консультація', text: 'Розуміємо бюджет, побажання та локацію' },
+          { title: 'Підбір', text: 'Готуємо добірку об\u2019єктів, що пасують саме вам' },
+          { title: 'Перегляди', text: 'Організуємо покази у зручний для вас час' },
+          { title: 'Угода', text: 'Перевіряємо документи та супроводжуємо до реєстрації' }
+        ]},
+        faq: [
+          { q: 'Чи перевіряєте документи перед продажем?', a: 'Так, кожен об\u2019єкт проходить юридичну перевірку: право власності, обтяження, реєстри. Ми не працюємо з ризикованими об\u2019єктами.' },
+          { q: 'Чи можна купити в розстрочку?', a: 'Часто так — власники наших домів іноді погоджуються на розстрочку. Також допомагаємо оформити банківську програму.' },
+          { q: 'Скільки коштує послуги для покупця?', a: 'Пошук та покази — безкоштовно. Оплата лише за супровід угоди — від 1,5% після успішного завершення.' },
+          { q: 'Чи покажете об\u2019єкт у вихідні?', a: 'Так, покази організовуємо щодня, включно з вихідними — за попередньою домовленістю.' }
+        ],
+        galleryAlbums: ['Об\u2019єкти', 'Локації'],
+        galleryTitles: null
+      },
+
+      service: {
+        icon: '🔧', name: 'Універсальні послуги',
+        desc: 'Клінінг, майстри, доставка, сервіс — будь-яка сфера',
+        themeKey: 'service',
+        modules: ['hero', 'stats', 'services', 'steps', 'pricing', 'faq', 'contact'],
+        siteTitle: '{{COMPANY}} — Професійні послуги | {{CITY}}',
+        heroTitle: 'Професійний <span style="color: var(--rose-deep); font-style: italic;">підхід</span> до кожної задачі',
+        heroSubtitle: '{{COMPANY}} — швидко, якісно, з гарантією. Працюємо у {{CITY}} щодня з 9:00 до 20:00. Безкоштовна консультація.',
+        aboutTitle: 'Чому нам довіряють',
+        aboutLead: 'Ми працюємо з {{YEAR}} року. За плечима — тисячі виконаних замовлень і клієнти, які повертаються та рекомендують нас друзям.',
+        services: [
+          { tag: 'Популярне', title: 'Стандартне замовлення', description: 'Основна послуга вашої сфери: якісно, в узгоджений строк, із фіксованою ціною.', slogan: '', price: 'від 500 грн', priceNote: '', highlight: true, albumName: 'Роботи' },
+          { tag: 'Комплекс', title: 'Комплексне обслуговування', description: 'Пакет робіт «під ключ» зі знижкою до 20% порівняно з разовими замовленнями.', slogan: '', price: 'від 1 500 грн', priceNote: '', highlight: false, albumName: 'Роботи' },
+          { tag: 'Терміново', title: 'Терміновий виїзд', description: 'Приїзд майстра впродовж 2 годин. Додаткова оплата за терміновість.', slogan: '', price: 'від 800 грн', priceNote: '', highlight: false, albumName: 'Команда' },
+          { tag: 'Для бізнесу', title: 'Обслуговування компаній', description: 'Договір для бізнесу: регулярність, документи, безготівковий розрахунок.', slogan: '', price: 'індивідуально', priceNote: '', highlight: false, albumName: 'Команда' }
+        ],
+        stats: { items: [
+          { number: '8+', label: 'років досвіду' }, { number: '2000+', label: 'виконаних замовлень' },
+          { number: '15 хв', label: 'середній час відповіді' }, { number: '98%', label: 'задоволених клієнтів' }
+        ]},
+        pricing: { subtitleTag: 'Ціни', title: 'Прозорі тарифи', description: 'Ціну називаємо до початку робіт — вона не змінюється.', items: [
+          { name: 'Разова послуга', price: 'від 500 грн', note: '', features: 'Виїзд фахівця\nРобота під ключ\nГарантія 30 днів', highlight: false },
+          { name: 'Абонемент', price: 'від 1 200 грн/міс', note: 'Вигідніше на 20%', features: '4 виїзди на місяць\nПріоритетний запис\nЗнижка на додаткові роботи', highlight: true },
+          { name: 'Для бізнесу', price: 'від 5 000 грн/міс', note: '', features: 'Персональний менеджер\nБезготівковий розрахунок\nЗакриваючі документи', highlight: false }
+        ]},
+        steps: { subtitleTag: 'Процес', title: 'Як ми працюємо', description: '', items: [
+          { title: 'Заявка', text: 'Телефонуйте або лишайте форму — відповідаємо за 15 хвилин' },
+          { title: 'Розрахунок', text: 'Уточнюємо деталі та називаємо фіксовану ціну' },
+          { title: 'Виконання', text: 'Прибуваємо вчасно та робимо роботу якісно' },
+          { title: 'Приймання', text: 'Ви приймаєте результат, ми даємо гарантію' }
+        ]},
+        faq: [
+          { q: 'Як швидко ви приїдете?', a: 'Стандартно — наступного дня. Є терміновий виїзд упродовж 2 годин з додатковою оплатою.' },
+          { q: 'Як можна оплатити?', a: 'Готівкою чи карткою після виконання робіт. Для бізнесу — безготівковий розрахунок із документами.' },
+          { q: 'Що входить у безкоштовну консультацію?', a: 'Розрахунок вартості, поради щодо матеріалів і термінів. Без жодних зобов\u2019язань замовити роботу.' },
+          { q: 'Яка гарантія на роботи?', a: 'Мінімум 30 днів на всі роботи. На окремі види послуг — до 12 місяців.' }
+        ],
+        galleryAlbums: ['Роботи', 'Команда'],
+        galleryTitles: null
+      }
+    };
+
     let designState = null;
     let modulesState = [];
 
@@ -745,6 +932,141 @@
       return modulesState.filter(function(m) { return m.enabled; }).map(function(m) { return m.id; });
     }
 
+    // ===== WIZARD: СТВОРЕННЯ НОВОГО ЛЕНДІНГУ =====
+    let wizardChoice = null;
+    let wizardStepNum = 1;
+
+    function isVirginSite() {
+      return window._configSource === 'default' && !localStorage.getItem('karina_admin_config');
+    }
+
+    function showWizard() {
+      document.getElementById('authScreen').style.display = 'none';
+      document.getElementById('dashboardScreen').style.display = 'none';
+      document.getElementById('wizardScreen').style.display = 'block';
+      wizardGoto(1);
+    }
+
+    function cancelWizard() {
+      document.getElementById('wizardScreen').style.display = 'none';
+      if (sessionStorage.getItem('admin_authenticated') === 'true') {
+        showDashboard();
+      } else {
+        document.getElementById('authScreen').style.display = 'block';
+      }
+    }
+
+    function wzVal(id) {
+      const el = document.getElementById(id);
+      return el ? el.value.trim() : '';
+    }
+
+    function wizardGoto(n) {
+      wizardStepNum = n;
+      [1, 2, 3].forEach(function(i) {
+        const el = document.getElementById('wizStep' + i);
+        if (el) el.style.display = i === n ? '' : 'none';
+      });
+      if (n === 1) renderWizardNiches();
+      if (n === 3) renderWizardSummary();
+    }
+
+    function renderWizardNiches() {
+      const c = document.getElementById('wizNicheCards');
+      if (!c || c.dataset.built === '1') return;
+      c.innerHTML = Object.keys(NICHE_PACKS).map(function(key) {
+        const p = NICHE_PACKS[key];
+        return '<button type="button" class="card-item" onclick="selectNiche(\'' + key + '\')" style="text-align:left; cursor:pointer;">' +
+          '<div style="font-size:2.2rem;">' + p.icon + '</div>' +
+          '<div style="font-weight:700; margin:8px 0 4px;">' + p.name + '</div>' +
+          '<div style="font-size:0.85rem; color:var(--text-muted); line-height:1.5;">' + p.desc + '</div>' +
+          '<div style="margin-top:10px; font-weight:600; color:var(--rose-deep); font-size:0.85rem;">Обрати →</div>' +
+          '</button>';
+      }).join('');
+    }
+
+    function selectNiche(key) {
+      wizardChoice = key;
+      wizardGoto(2);
+    }
+
+    function renderWizardSummary() {
+      const p = NICHE_PACKS[wizardChoice];
+      if (!p) { wizardGoto(1); return; }
+      const th = THEME_PRESETS[p.themeKey];
+      const city = wzVal('wzCity');
+      document.getElementById('wizSummary').innerHTML =
+        '<ul style="margin:0; padding-left:20px; line-height:2; font-size:0.95rem;">' +
+        '<li><b>Ніша:</b> ' + p.icon + ' ' + p.name + '</li>' +
+        '<li><b>Компанія:</b> ' + escAttr(wzVal('wzCompany')) + '</li>' +
+        '<li><b>Телефон:</b> ' + escAttr(wzVal('wzPhone')) + '</li>' +
+        (city ? '<li><b>Місто:</b> ' + escAttr(city) + '</li>' : '') +
+        '<li><b>Тема оформлення:</b> ' + th.name + '</li>' +
+        '<li><b>Модулів на сайті:</b> ' + p.modules.length + '</li>' +
+        '<li style="color:var(--text-muted); font-size:0.85rem; list-style:none;">ℹ️ У галереї будуть фото-заглушки — замініть їх реальними фото клієнта в розділі «Альбоми».</li>' +
+        '</ul>';
+    }
+
+    function finishWizard() {
+      const company = wzVal('wzCompany');
+      const phone = wzVal('wzPhone');
+      const city = wzVal('wzCity');
+      if (!company || !phone) { alert('Вкажіть назву компанії та телефон!'); wizardGoto(2); return; }
+      const pack = NICHE_PACKS[wizardChoice];
+      if (!pack) { alert('Оберіть нішу!'); wizardGoto(1); return; }
+
+      const fill = function(s) {
+        return String(s)
+          .replace(/\{\{COMPANY\}\}/g, company)
+          .replace(/\{\{CITY\}\}/g, city || 'вашому місті')
+          .replace(/\{\{PHONE\}\}/g, phone);
+      };
+
+      const cfg = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+      cfg.siteTitle = fill(pack.siteTitle);
+      cfg.logoText = company;
+      cfg.phone = phone;
+      cfg.viberPhone = phone.replace(/[^0-9+]/g, '') ? phone : '';
+      cfg.heroTitle = fill(pack.heroTitle);
+      cfg.heroSubtitle = fill(pack.heroSubtitle);
+      cfg.aboutTitle = fill(pack.aboutTitle);
+      cfg.aboutLead = fill(pack.aboutLead);
+      cfg.services = JSON.parse(JSON.stringify(pack.services));
+      cfg.stats = JSON.parse(JSON.stringify(pack.stats));
+      cfg.pricing = JSON.parse(JSON.stringify(pack.pricing));
+      cfg.steps = JSON.parse(JSON.stringify(pack.steps));
+      cfg.faq = pack.faq.map(function(f) { return { q: fill(f.q), a: fill(f.a) }; });
+      cfg.reviews = JSON.parse(JSON.stringify(GENERIC_REVIEWS));
+      cfg.gallery = phGallery(pack.galleryAlbums, pack.galleryTitles);
+      cfg.heroPhoto = 'images/photo_1.jpg';
+      cfg.aboutPhoto = 'images/photo_2.jpg';
+
+      const th = THEME_PRESETS[pack.themeKey];
+      cfg.theme = Object.assign(
+        { preset: pack.themeKey, fontHeading: th.fontHeading, fontBody: th.fontBody, heroRadius: th.heroRadius },
+        JSON.parse(JSON.stringify(th.colors))
+      );
+      cfg.modules = pack.modules.slice();
+
+      siteConfig = cfg;
+      localStorage.setItem('karina_admin_config', JSON.stringify(siteConfig));
+
+      // Одразу показуємо адмінку з новим контентом і публікуємо
+      showDashboard();
+      const gh = saveGithubSettingsToStorage();
+      setPublishStatus('⏳ Публікую новий сайт «' + company + '»...', 'wait');
+
+      githubPushSiteData(gh).then(function(ok) {
+        if (ok) {
+          setPublishStatus('🚀 Лендінг для «' + company + '» опубліковано! Сайт буде видимим всім за 1-2 хвилини.', 'ok');
+        } else {
+          setPublishStatus('❌ Не вдалося опублікувати на GitHub (перевірте токен). Контент збережено локально.', 'err');
+        }
+      }).catch(function(e) {
+        setPublishStatus('❌ Помилка публікації: ' + e.message, 'err');
+      });
+    }
+
     // ===== РЕДАКТОРИ КОНТЕНТУ НОВИХ МОДУЛІВ =====
     function escAttr(s) {
       return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -844,6 +1166,7 @@
         if (res.ok) {
           const remote = await res.json();
           siteConfig = { ...DEFAULT_CONFIG, ...remote };
+          window._configSource = 'remote';
           if (!siteConfig.services || !siteConfig.services.length) siteConfig.services = DEFAULT_SERVICES;
           if (!siteConfig.gallery || !siteConfig.gallery.length) siteConfig.gallery = DEFAULT_GALLERY;
           if (!siteConfig.faq || !siteConfig.faq.length) siteConfig.faq = DEFAULT_FAQ;
@@ -854,6 +1177,7 @@
       // 2. Fallback: локальний конфіг
       const saved = localStorage.getItem('karina_admin_config');
       if (saved) {
+        window._configSource = 'local';
         try {
           const parsed = JSON.parse(saved);
           siteConfig = { ...DEFAULT_CONFIG, ...parsed };
@@ -861,6 +1185,8 @@
           if (!siteConfig.gallery || !siteConfig.gallery.length) siteConfig.gallery = DEFAULT_GALLERY;
           if (!siteConfig.faq || !siteConfig.faq.length) siteConfig.faq = DEFAULT_FAQ;
         } catch(e) {}
+      } else {
+        window._configSource = 'default';
       }
     }
 
@@ -870,7 +1196,7 @@
       const pass = document.getElementById('passwordInput').value.trim();
       if (login === 'admin_2026' && pass === 'AdMin__2026') {
         sessionStorage.setItem('admin_authenticated', 'true');
-        showDashboard();
+        if (isVirginSite()) showWizard(); else showDashboard();
       } else {
         alert('Невірний логін або пароль!');
       }
@@ -1411,7 +1737,8 @@
       } catch(e) {}
 
       loadConfig().then(() => {
-        if (sessionStorage.getItem('admin_authenticated') === 'true') showDashboard();
+        if (sessionStorage.getItem('admin_authenticated') !== 'true') return;
+        if (isVirginSite()) showWizard(); else showDashboard();
       });
     });
   </script>
