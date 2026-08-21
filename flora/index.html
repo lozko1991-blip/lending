@@ -55,6 +55,7 @@
       --radius-lg: 28px;
       --radius-md: 18px;
       --radius-sm: 12px;
+      --hero-radius: 240px 240px 24px 24px;
 
       --font-heading: 'Cormorant Garamond', serif;
       --font-body: 'Plus Jakarta Sans', sans-serif;
@@ -324,7 +325,7 @@
       width: 100%;
       max-width: 450px;
       height: 560px;
-      border-radius: var(--radius-arch);
+      border-radius: var(--hero-radius);
       overflow: hidden;
       box-shadow: 0 25px 60px rgba(var(--accent-rgb), 0.18);
       border: 8px solid #FFFFFF;
@@ -600,7 +601,7 @@
     }
 
     /* ===== МОДУЛЬ: ЦИФРИ / СТАТИСТИКА ===== */
-    .stats-section { background: var(--rose-deep); }
+    .stats-section { background: linear-gradient(135deg, var(--rose-deep) 0%, var(--rose-dark) 100%); }
     .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 24px; text-align: center; }
     .stat-card { padding: 10px; }
     .stat-number { font-family: var(--font-heading); font-size: clamp(2.6rem, 5vw, 3.8rem); font-weight: 700; color: #FFFFFF; line-height: 1.1; }
@@ -626,6 +627,10 @@
     .step-num { width: 58px; height: 58px; margin: 0 auto 16px; border-radius: 50%; background: linear-gradient(135deg, var(--rose-deep), var(--rose-dark)); color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: var(--font-heading); font-size: 1.6rem; font-weight: 700; box-shadow: 0 8px 20px rgba(var(--accent-rgb), 0.3); }
     .step-card h4 { font-family: var(--font-heading); font-size: 1.25rem; color: var(--text-main); margin-bottom: 8px; }
     .step-card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.65; }
+    @media (min-width: 769px) {
+      .steps-grid { position: relative; }
+      .steps-grid::before { content: ''; position: absolute; top: 39px; left: 12%; right: 12%; height: 2px; background: var(--rose-light); }
+    }
 
     /* ===== МОДУЛЬ: КАРТА ===== */
     .map-wrap { max-width: 1020px; margin: 0 auto; border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-card); height: 420px; background: var(--bg-blush); }
@@ -963,7 +968,8 @@
         textBody: '#59474B',
         textMuted: '#8C787C',
         fontHeading: 'Cormorant Garamond',
-        fontBody: 'Plus Jakarta Sans'
+        fontBody: 'Plus Jakarta Sans',
+        heroRadius: 'arch'
       },
       modules: ['hero', 'about', 'services', 'portfolio', 'reviews', 'faq', 'contact']
     };
@@ -1026,6 +1032,8 @@
         favLink.href = siteConfig.favicon;
         favLink.type = siteConfig.favicon.startsWith('data:image/png') ? 'image/png' : 'image/jpeg';
       }
+      const ogTitle = document.querySelector('meta[property="og:title"]');
+      if (ogTitle && siteConfig.siteTitle) ogTitle.setAttribute('content', siteConfig.siteTitle);
 
       // Phone
       if (siteConfig.phone) {
@@ -1417,9 +1425,10 @@
       if (!grid) return;
       var reviews = siteConfig.reviews || DEFAULT_REVIEWS;
       if (!reviews.length) { grid.innerHTML = ""; return; }
-      grid.innerHTML = reviews.map(function(r) {
-        return '<div class="review-card"><div class="review-stars">' + "★".repeat(r.stars || 5) + "☆".repeat(5 - (r.stars || 5)) + '</div><p style="color:var(--text-body);font-size:0.95rem;line-height:1.6;margin-bottom:16px;">"' + r.text + '"</p><div style="display:flex;align-items:center;gap:12px;"><img src="' + (r.avatar || '') + '" style="width:48px;height:48px;border-radius:50%;object-fit:cover;background:var(--rose-light);" onerror="this.style.display=\'none\'"><div><div style="font-weight:700;color:var(--text-main);">' + r.name + '</div><div style="font-size:0.82rem;color:var(--text-muted);">' + r.role + '</div></div></div></div>';
+      grid.innerHTML = reviews.map(function(r, idx) {
+        return '<div class="review-card reveal" style="transition-delay:' + (idx * 80) + 'ms"><div class="review-stars">' + "★".repeat(r.stars || 5) + "☆".repeat(5 - (r.stars || 5)) + '</div><p style="color:var(--text-body);font-size:0.95rem;line-height:1.6;margin-bottom:16px;">"' + r.text + '"</p><div style="display:flex;align-items:center;gap:12px;"><img src="' + (r.avatar || '') + '" style="width:48px;height:48px;border-radius:50%;object-fit:cover;background:var(--rose-light);" onerror="this.style.display=\'none\'"><div><div style="font-weight:700;color:var(--text-main);">' + r.name + '</div><div style="font-size:0.82rem;color:var(--text-muted);">' + r.role + '</div></div></div></div>';
       }).join("");
+      watchReveal(grid);
     }
 
     // ===== ТЕМА (кольори + шрифти з конфігу) =====
@@ -1465,6 +1474,8 @@
       if (rgbMain) r.setProperty('--text-main-rgb', rgbMain);
       if (t.fontHeading && FONT_STACKS[t.fontHeading]) r.setProperty('--font-heading', FONT_STACKS[t.fontHeading]);
       if (t.fontBody && FONT_STACKS[t.fontBody]) r.setProperty('--font-body', FONT_STACKS[t.fontBody]);
+      const HERO_RADIUS = { arch: '240px 240px 24px 24px', rounded: '28px', square: '8px' };
+      r.setProperty('--hero-radius', HERO_RADIUS[t.heroRadius] || HERO_RADIUS.arch);
     }
 
     // ===== МОДУЛІ (секції: порядок + увімкнення з конфігу) =====
@@ -1506,13 +1517,24 @@
       return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
+    // Підключаємо динамічно створені .reveal-елементи до scroll-анімацій
+    function watchReveal(rootEl) {
+      if (!window.appScrollObserver || !rootEl) return;
+      rootEl.querySelectorAll('.reveal').forEach(function(el) {
+        if (el.dataset.revObs === '1') return;
+        el.dataset.revObs = '1';
+        window.appScrollObserver.observe(el);
+      });
+    }
+
     function renderStats() {
       const grid = document.getElementById('dynamicStatsGrid');
       if (!grid) return;
       const items = (siteConfig.stats && siteConfig.stats.items) || [];
-      grid.innerHTML = items.map(function(it) {
-        return '<div class="stat-card"><div class="stat-number">' + escHtml(it.number) + '</div><div class="stat-label">' + escHtml(it.label) + '</div></div>';
+      grid.innerHTML = items.map(function(it, i) {
+        return '<div class="stat-card reveal" style="transition-delay:' + (i * 80) + 'ms"><div class="stat-number">' + escHtml(it.number) + '</div><div class="stat-label">' + escHtml(it.label) + '</div></div>';
       }).join('');
+      watchReveal(grid);
     }
 
     function renderPricing() {
@@ -1527,10 +1549,10 @@
           (p.description ? '<p class="section-description">' + escHtml(p.description) + '</p>' : '');
       }
       const items = p.items || [];
-      grid.innerHTML = items.map(function(c) {
+      grid.innerHTML = items.map(function(c, i) {
         const feats = String(c.features || '').split('\n').filter(function(x){ return x.trim(); })
           .map(function(f){ return '<li>' + escHtml(f.trim()) + '</li>'; }).join('');
-        return '<div class="price-card' + (c.highlight ? ' highlight' : '') + '">' +
+        return '<div class="price-card reveal' + (c.highlight ? ' highlight' : '') + '" style="transition-delay:' + (i * 90) + 'ms">' +
           (c.highlight ? '<div class="price-badge">Популярний</div>' : '') +
           '<div class="price-name">' + escHtml(c.name) + '</div>' +
           '<div class="price-value">' + escHtml(c.price) + '</div>' +
@@ -1538,6 +1560,7 @@
           (feats ? '<ul class="price-features">' + feats + '</ul>' : '') +
           '</div>';
       }).join('');
+      watchReveal(grid);
     }
 
     function renderSteps() {
@@ -1553,9 +1576,10 @@
       }
       const items = s.items || [];
       grid.innerHTML = items.map(function(st, i) {
-        return '<div class="step-card"><div class="step-num">' + (i + 1) + '</div>' +
+        return '<div class="step-card reveal" style="transition-delay:' + (i * 90) + 'ms"><div class="step-num">' + (i + 1) + '</div>' +
           '<h4>' + escHtml(st.title) + '</h4><p>' + escHtml(st.text) + '</p></div>';
       }).join('');
+      watchReveal(grid);
     }
 
     function renderMap() {

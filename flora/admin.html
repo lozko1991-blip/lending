@@ -366,6 +366,14 @@
           </select>
         </div>
       </div>
+      <div class="form-group">
+        <label class="form-label">Форма головного фото (Hero)</label>
+        <select id="selHeroRadius" class="form-select" style="max-width:320px;">
+          <option value="arch">Арка (класична, для флористики)</option>
+          <option value="rounded">Скруглені кути (універсальна)</option>
+          <option value="square">Майже прямі (стримана)</option>
+        </select>
+      </div>
 
       <h3 style="font-size: 1.4rem; margin-top: 30px; margin-bottom: 6px;">🧩 Модулі сайту</h3>
       <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 14px;">Увімкніть потрібні секції та задайте їхній порядок на сторінці (стрілками ↑ ↓).</p>
@@ -558,7 +566,9 @@
           { title: 'Результат', text: 'Ви отримуєте готовий результат точно в строк' }
         ]
       },
-      map: { embedUrl: '' }
+      map: { embedUrl: '' },
+      theme: { preset: 'flora', bgIvory: '#FAF6F3', bgWarm: '#FFFBF9', bgBlush: '#F7EBEF', accentLight: '#F4D8E1', accentSoft: '#E8B4C3', accentMedium: '#D9899E', accentDeep: '#C25975', accentDark: '#8F2D46', textMain: '#2E1F23', textBody: '#59474B', textMuted: '#8C787C', fontHeading: 'Cormorant Garamond', fontBody: 'Plus Jakarta Sans', heroRadius: 'arch' },
+      modules: ['hero', 'about', 'services', 'portfolio', 'reviews', 'faq', 'contact']
     };
 
     let siteConfig = { ...DEFAULT_CONFIG };
@@ -570,25 +580,25 @@
         accentLight: '#F4D8E1', accentSoft: '#E8B4C3', accentMedium: '#D9899E',
         accentDeep: '#C25975', accentDark: '#8F2D46',
         textMain: '#2E1F23', textBody: '#59474B', textMuted: '#8C787C'
-      }, fontHeading: 'Cormorant Garamond', fontBody: 'Plus Jakarta Sans' },
+      }, fontHeading: 'Cormorant Garamond', fontBody: 'Plus Jakarta Sans', heroRadius: 'arch' },
       builder: { name: '🏗 Будівництво', colors: {
         bgIvory: '#F7F6F3', bgWarm: '#F0EEE9', bgBlush: '#FBEFE3',
         accentLight: '#FFE8D1', accentSoft: '#FFD5AE', accentMedium: '#F0A45B',
         accentDeep: '#D97B29', accentDark: '#8F4A12',
         textMain: '#22252A', textBody: '#44484F', textMuted: '#7A7F87'
-      }, fontHeading: 'Roboto Condensed', fontBody: 'Inter' },
+      }, fontHeading: 'Roboto Condensed', fontBody: 'Inter', heroRadius: 'rounded' },
       estate: { name: '🏡 Нерухомість', colors: {
         bgIvory: '#F8F7F4', bgWarm: '#F2F0EA', bgBlush: '#F4EDDD',
         accentLight: '#EDDFC2', accentSoft: '#DEC68E', accentMedium: '#C6A352',
         accentDeep: '#A07F30', accentDark: '#66501A',
         textMain: '#1E2430', textBody: '#3C4453', textMuted: '#767E8C'
-      }, fontHeading: 'Playfair Display', fontBody: 'Montserrat' },
+      }, fontHeading: 'Playfair Display', fontBody: 'Montserrat', heroRadius: 'rounded' },
       service: { name: '🔧 Послуги', colors: {
         bgIvory: '#F6F8FB', bgWarm: '#EFF3F9', bgBlush: '#EAF1FC',
         accentLight: '#DBEAFE', accentSoft: '#BFDBFE', accentMedium: '#60A5FA',
         accentDeep: '#2563EB', accentDark: '#173E8C',
         textMain: '#111827', textBody: '#374151', textMuted: '#6B7280'
-      }, fontHeading: 'Montserrat', fontBody: 'Inter' }
+      }, fontHeading: 'Montserrat', fontBody: 'Inter', heroRadius: 'rounded' }
     };
 
     const COLOR_FIELDS = [
@@ -676,6 +686,8 @@
       const fb = document.getElementById('selFontBody');
       if (fh && siteConfig.theme && siteConfig.theme.fontHeading) fh.value = siteConfig.theme.fontHeading;
       if (fb && siteConfig.theme && siteConfig.theme.fontBody) fb.value = siteConfig.theme.fontBody;
+      const hr = document.getElementById('selHeroRadius');
+      if (hr) hr.value = (siteConfig.theme && siteConfig.theme.heroRadius) || 'arch';
     }
 
     function applyPreset(key) {
@@ -687,6 +699,8 @@
       const fb = document.getElementById('selFontBody');
       if (fh) fh.value = p.fontHeading;
       if (fb) fb.value = p.fontBody;
+      const hr = document.getElementById('selHeroRadius');
+      if (hr) hr.value = p.heroRadius || 'rounded';
     }
 
     function collectDesignState() {
@@ -698,6 +712,8 @@
       const fb = document.getElementById('selFontBody');
       if (fh) designState.fontHeading = fh.value;
       if (fb) designState.fontBody = fb.value;
+      const hr = document.getElementById('selHeroRadius');
+      if (hr) designState.heroRadius = hr.value;
       return designState;
     }
 
@@ -1330,6 +1346,25 @@
       siteConfig.heroSubtitle = document.getElementById('cfgHeroSubtitle').value.trim();
       siteConfig.aboutTitle = document.getElementById('cfgAboutTitle').value.trim();
       siteConfig.aboutLead = document.getElementById('cfgAboutLead').value.trim();
+
+      // Заголовки тарифів / кроків + Карта (критично: інакше не зберігаються!)
+      const gv = function(id) { const el = document.getElementById(id); return el ? el.value.trim() : null; };
+      if (!siteConfig.pricing) siteConfig.pricing = { items: [] };
+      siteConfig.pricing.subtitleTag = gv('prTag');
+      siteConfig.pricing.title = gv('prTitle');
+      siteConfig.pricing.description = gv('prDesc');
+      if (!siteConfig.steps) siteConfig.steps = { items: [] };
+      siteConfig.steps.subtitleTag = gv('stTag');
+      siteConfig.steps.title = gv('stTitle');
+      siteConfig.steps.description = gv('stDesc');
+      let mapRaw = gv('cfgMapEmbed') || '';
+      // Якщо вставили весь <iframe ...> код — витягуємо лише src
+      if (mapRaw.includes('<iframe')) {
+        const mSrc = mapRaw.match(/src=["']([^"']+)["']/);
+        if (mSrc) mapRaw = mSrc[1];
+      }
+      if (!siteConfig.map) siteConfig.map = {};
+      siteConfig.map.embedUrl = mapRaw;
 
       // Тема та модулі (вкладка Дизайн & Модулі)
       siteConfig.theme = collectDesignState();
