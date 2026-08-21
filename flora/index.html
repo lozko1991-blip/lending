@@ -21,7 +21,7 @@
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Roboto+Condensed:wght@400;500;700&display=swap" rel="stylesheet">
 
   <style>
     :root {
@@ -29,7 +29,7 @@
       --bg-warm: #FFFBF9;
       --bg-card: #FFFFFF;
       --bg-blush: #F7EBEF;
-      
+
       --rose-light: #F4D8E1;
       --rose-soft: #E8B4C3;
       --rose-medium: #D9899E;
@@ -41,9 +41,15 @@
       --text-muted: #8C787C;
       --text-light: #B3A0A4;
 
-      --shadow-subtle: 0 12px 36px rgba(194, 89, 117, 0.08);
-      --shadow-hover: 0 20px 50px rgba(194, 89, 117, 0.16);
-      --shadow-card: 0 8px 30px rgba(46, 31, 35, 0.04);
+      /* RGB-компоненти для rgba() — оновлюються темою */
+      --accent-rgb: 194, 89, 117;
+      --accent-dark-rgb: 143, 45, 70;
+      --accent-light-rgb: 244, 216, 225;
+      --text-main-rgb: 46, 31, 35;
+
+      --shadow-subtle: 0 12px 36px rgba(var(--accent-rgb), 0.08);
+      --shadow-hover: 0 20px 50px rgba(var(--accent-rgb), 0.16);
+      --shadow-card: 0 8px 30px rgba(var(--text-main-rgb), 0.04);
 
       --radius-arch: 240px 240px 24px 24px;
       --radius-lg: 28px;
@@ -51,6 +57,7 @@
       --radius-sm: 12px;
 
       --font-heading: 'Cormorant Garamond', serif;
+      --font-body: 'Plus Jakarta Sans', sans-serif;
       --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
@@ -66,7 +73,7 @@
     }
 
     body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: var(--font-body);
       background-color: var(--bg-ivory);
       color: var(--text-body);
       line-height: 1.7;
@@ -265,7 +272,7 @@
       z-index: 1000;
       background: rgba(250, 246, 243, 0.85);
       backdrop-filter: blur(20px);
-      border-bottom: 1px solid rgba(244, 216, 225, 0.5);
+      border-bottom: 1px solid rgba(var(--accent-light-rgb), 0.5);
     }
 
     .header-inner {
@@ -319,7 +326,7 @@
       height: 560px;
       border-radius: var(--radius-arch);
       overflow: hidden;
-      box-shadow: 0 25px 60px rgba(194, 89, 117, 0.18);
+      box-shadow: 0 25px 60px rgba(var(--accent-rgb), 0.18);
       border: 8px solid #FFFFFF;
     }
 
@@ -349,7 +356,7 @@
       background: #FFFFFF;
       border-radius: var(--radius-lg);
       padding: 36px;
-      border: 1px solid rgba(244, 216, 225, 0.8);
+      border: 1px solid rgba(var(--accent-light-rgb), 0.8);
       box-shadow: var(--shadow-card);
       transition: var(--transition);
       display: flex;
@@ -721,22 +728,22 @@
 
   <!-- SUCCESS CONFIRMATION MODAL (HIDDEN BY DEFAULT) -->
   <div id="successModal" onclick="closeSuccessModal(event)" style="display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(8px); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
-    <div style="background: #FFFFFF; width: 100%; max-width: 440px; border-radius: 24px; padding: 40px; position: relative; text-align: center; box-shadow: 0 25px 70px rgba(0,0,0,0.3); border: 1px solid #F4D8E1;" onclick="event.stopPropagation()">
-      <button onclick="closeSuccessModal()" style="position: absolute; top: 18px; right: 20px; font-size: 1.8rem; background: none; border: none; cursor: pointer; color: #8C787C;">&times;</button>
+    <div style="background: #FFFFFF; width: 100%; max-width: 440px; border-radius: 24px; padding: 40px; position: relative; text-align: center; box-shadow: 0 25px 70px rgba(0,0,0,0.3); border: 1px solid var(--rose-light);" onclick="event.stopPropagation()">
+      <button onclick="closeSuccessModal()" style="position: absolute; top: 18px; right: 20px; font-size: 1.8rem; background: none; border: none; cursor: pointer; color: var(--text-muted);">&times;</button>
       <div style="font-size: 3.5rem; margin-bottom: 10px;">🌸</div>
-      <h3 style="font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; margin-bottom: 10px; color: #8F2D46;" id="successModalTitle">Заявку прийнято!</h3>
-      <p style="font-size: 1rem; color: #59474B; margin-bottom: 24px; line-height: 1.6;" id="successModalText">
+      <h3 style="font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; margin-bottom: 10px; color: var(--rose-dark);" id="successModalTitle">Заявку прийнято!</h3>
+      <p style="font-size: 1rem; color: var(--text-body); margin-bottom: 24px; line-height: 1.6;" id="successModalText">
         Дякуємо! Вашу заявку успішно надіслано. Карінка зв'яжеться з вами протягом 15 хвилин для узгодження всіх деталей!
       </p>
-      <button class="btn btn-primary" style="width: 100%; background: linear-gradient(135deg, #C25975 0%, #8F2D46 100%); color: #FFFFFF; border-radius: 50px; padding: 14px 28px; font-weight: 600; border: none; cursor: pointer;" onclick="closeSuccessModal()">Чудово! ✨</button>
+      <button class="btn btn-primary" style="width: 100%; background: linear-gradient(135deg, var(--rose-deep) 0%, var(--rose-dark) 100%); color: #FFFFFF; border-radius: 50px; padding: 14px 28px; font-weight: 600; border: none; cursor: pointer;" onclick="closeSuccessModal()">Чудово! ✨</button>
     </div>
   </div>
 
   <!-- ORDER MODAL -->
   <div id="orderModal" style="display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(8px); z-index: 9999; align-items: center; justify-content: center; padding: 20px;" onclick="closeModal(event)">
     <div style="background: #FFFFFF; width: 100%; max-width: 440px; border-radius: 24px; padding: 40px; position: relative; box-shadow: 0 25px 70px rgba(0,0,0,0.3);" onclick="event.stopPropagation()">
-      <button onclick="closeModal()" style="position: absolute; top: 18px; right: 20px; font-size: 1.8rem; background: none; border: none; cursor: pointer; color: #8C787C;">&times;</button>
-      <h3 style="font-family: 'Cormorant Garamond', serif; font-size: 2rem; margin-bottom: 20px; color: #8F2D46;" id="modalTitle"></h3>
+      <button onclick="closeModal()" style="position: absolute; top: 18px; right: 20px; font-size: 1.8rem; background: none; border: none; cursor: pointer; color: var(--text-muted);">&times;</button>
+      <h3 style="font-family: 'Cormorant Garamond', serif; font-size: 2rem; margin-bottom: 20px; color: var(--rose-dark);" id="modalTitle"></h3>
       <form onsubmit="handleModalSubmit(event)" style="display: flex; flex-direction: column; gap: 18px;">
         <div style="margin-bottom: 0;"><input type="text" id="modalName" placeholder="Ваше ім'я" class="form-input" required></div>
         <div style="margin-bottom: 0;"><input type="tel" id="modalPhone" placeholder="Ваш телефон" class="form-input" required></div>
@@ -848,7 +855,24 @@
       services: DEFAULT_SERVICES,
       gallery: DEFAULT_GALLERY,
       reviews: DEFAULT_REVIEWS,
-      faq: DEFAULT_FAQ
+      faq: DEFAULT_FAQ,
+      theme: {
+        preset: 'flora',
+        bgIvory: '#FAF6F3',
+        bgWarm: '#FFFBF9',
+        bgBlush: '#F7EBEF',
+        accentLight: '#F4D8E1',
+        accentSoft: '#E8B4C3',
+        accentMedium: '#D9899E',
+        accentDeep: '#C25975',
+        accentDark: '#8F2D46',
+        textMain: '#2E1F23',
+        textBody: '#59474B',
+        textMuted: '#8C787C',
+        fontHeading: 'Cormorant Garamond',
+        fontBody: 'Plus Jakarta Sans'
+      },
+      modules: ['hero', 'about', 'services', 'portfolio', 'reviews', 'faq', 'contact']
     };
 
     let siteConfig = { ...DEFAULT_CONFIG };
@@ -981,6 +1005,9 @@
       renderReviews();
       renderFaq();
       renderServiceSelect();
+
+      applyTheme();
+      applyModules();
     }
 
     async function sendTelegramMessage(text) {
@@ -1148,7 +1175,7 @@
           <img src="${p.url}" alt="${p.title || 'Фото'}" style="width: 100%; height: ${isMobile ? '180px' : '260px'}; object-fit: cover; display: block;">
           <div style="padding: 12px 14px;">
             <div style="font-weight: 600; font-size: ${isMobile ? '0.9rem' : '1rem'}; color: var(--rose-dark); margin-bottom: 2px;">${p.title || 'Краса від Карінки'}</div>
-            <div style="font-size: 0.8rem; color: #8C787C;">${p.category || 'Портфоліо'}</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">${p.category || 'Портфоліо'}</div>
           </div>
         </div>
       `).join('');
@@ -1296,6 +1323,92 @@
       grid.innerHTML = reviews.map(function(r) {
         return '<div class="review-card"><div class="review-stars">' + "★".repeat(r.stars || 5) + "☆".repeat(5 - (r.stars || 5)) + '</div><p style="color:var(--text-body);font-size:0.95rem;line-height:1.6;margin-bottom:16px;">"' + r.text + '"</p><div style="display:flex;align-items:center;gap:12px;"><img src="' + (r.avatar || '') + '" style="width:48px;height:48px;border-radius:50%;object-fit:cover;background:var(--rose-light);" onerror="this.style.display=\'none\'"><div><div style="font-weight:700;color:var(--text-main);">' + r.name + '</div><div style="font-size:0.82rem;color:var(--text-muted);">' + r.role + '</div></div></div></div>';
       }).join("");
+    }
+
+    // ===== ТЕМА (кольори + шрифти з конфігу) =====
+    function hexToRgb(hex) {
+      try {
+        let h = String(hex).replace('#', '');
+        if (h.length === 3) h = h.split('').map(function(x) { return x + x; }).join('');
+        const n = parseInt(h, 16);
+        return ((n >> 16) & 255) + ', ' + ((n >> 8) & 255) + ', ' + (n & 255);
+      } catch(e) { return null; }
+    }
+
+    const FONT_STACKS = {
+      'Cormorant Garamond': "'Cormorant Garamond', serif",
+      'Playfair Display': "'Playfair Display', serif",
+      'Montserrat': "'Montserrat', sans-serif",
+      'Roboto Condensed': "'Roboto Condensed', sans-serif",
+      'Inter': "'Inter', sans-serif",
+      'Plus Jakarta Sans': "'Plus Jakarta Sans', sans-serif"
+    };
+
+    function applyTheme() {
+      const t = siteConfig.theme || {};
+      const r = document.documentElement.style;
+      if (t.bgIvory) r.setProperty('--bg-ivory', t.bgIvory);
+      if (t.bgWarm) r.setProperty('--bg-warm', t.bgWarm);
+      if (t.bgBlush) r.setProperty('--bg-blush', t.bgBlush);
+      if (t.accentLight) r.setProperty('--rose-light', t.accentLight);
+      if (t.accentSoft) r.setProperty('--rose-soft', t.accentSoft);
+      if (t.accentMedium) r.setProperty('--rose-medium', t.accentMedium);
+      if (t.accentDeep) r.setProperty('--rose-deep', t.accentDeep);
+      if (t.accentDark) r.setProperty('--rose-dark', t.accentDark);
+      if (t.textMain) r.setProperty('--text-main', t.textMain);
+      if (t.textBody) r.setProperty('--text-body', t.textBody);
+      if (t.textMuted) r.setProperty('--text-muted', t.textMuted);
+      const rgbDeep = hexToRgb(t.accentDeep || '#C25975');
+      const rgbDark = hexToRgb(t.accentDark || '#8F2D46');
+      const rgbLight = hexToRgb(t.accentLight || '#F4D8E1');
+      const rgbMain = hexToRgb(t.textMain || '#2E1F23');
+      if (rgbDeep) r.setProperty('--accent-rgb', rgbDeep);
+      if (rgbDark) r.setProperty('--accent-dark-rgb', rgbDark);
+      if (rgbLight) r.setProperty('--accent-light-rgb', rgbLight);
+      if (rgbMain) r.setProperty('--text-main-rgb', rgbMain);
+      if (t.fontHeading && FONT_STACKS[t.fontHeading]) r.setProperty('--font-heading', FONT_STACKS[t.fontHeading]);
+      if (t.fontBody && FONT_STACKS[t.fontBody]) r.setProperty('--font-body', FONT_STACKS[t.fontBody]);
+    }
+
+    // ===== МОДУЛІ (секції: порядок + увімкнення з конфігу) =====
+    const DEFAULT_MODULE_ORDER = ['hero', 'about', 'services', 'portfolio', 'reviews', 'faq', 'contact'];
+
+    function applyModules() {
+      let order = DEFAULT_MODULE_ORDER;
+      if (Array.isArray(siteConfig.modules) && siteConfig.modules.length) {
+        order = siteConfig.modules.filter(function(id) { return document.getElementById(id); });
+        // Додаємо секції, які є в DOM але не в конфігу (сумісність)
+        DEFAULT_MODULE_ORDER.forEach(function(id) {
+          if (!order.includes(id)) order.push(id);
+        });
+      }
+
+      const footer = document.querySelector('footer');
+      const enabled = [];
+
+      // Переставляємо активні секції в заданому порядку (безпосередньо перед footer)
+      order.forEach(function(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        enabled.push(id);
+        el.style.display = '';
+        if (footer && footer.parentElement === el.parentElement && footer !== el.nextElementSibling) {
+          try { footer.parentElement.insertBefore(el, footer); } catch(e) {}
+        }
+      });
+
+      // Ховаємо вимкнені
+      DEFAULT_MODULE_ORDER.forEach(function(id) {
+        const el = document.getElementById(id);
+        if (el && !enabled.includes(id)) el.style.display = 'none';
+      });
+
+      // Синхронізуємо навігацію (ховаємо лінки на вимкнені секції)
+      ['about', 'services', 'portfolio', 'reviews', 'faq', 'contact'].forEach(function(id) {
+        document.querySelectorAll('a[href="#' + id + '"]').forEach(function(a) {
+          a.style.display = enabled.includes(id) ? '' : 'none';
+        });
+      });
     }
 
     function renderServiceSelect() {

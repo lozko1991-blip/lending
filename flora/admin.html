@@ -244,6 +244,7 @@
 
     <div class="nav-tabs">
       <button class="tab-btn active" onclick="switchTab('tabNotifications', this)">📩 Контакти & Telegram</button>
+      <button class="tab-btn" onclick="switchTab('tabDesign', this)">🎨 Дизайн & Модулі</button>
       <button class="tab-btn" onclick="switchTab('tabServices', this)">🛍 Послуги (Товари)</button>
       <button class="tab-btn" onclick="switchTab('tabPhotos', this)">🖼 Альбоми & Редактор Фото</button>
       <button class="tab-btn" onclick="switchTab('tabContent', this)">✏️ Тексти & Контент</button>
@@ -335,7 +336,43 @@
       </div>
     </div>
 
-    <!-- TAB 2: SERVICES (PRODUCTS) -->
+    <!-- TAB 2: DESIGN & MODULES -->
+    <div class="tab-content" id="tabDesign">
+      <h3 style="font-size: 1.4rem; margin-bottom: 6px;">🎨 Тема оформлення</h3>
+      <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 16px;">Оберіть готовий пресет або налаштуйте кольори вручну. Зміни застосуються до всього сайту після збереження.</p>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px;" id="presetButtons"></div>
+
+      <h4 style="margin-bottom:12px;">Кольори</h4>
+      <div class="grid-2" id="colorInputs"></div>
+
+      <h4 style="margin:20px 0 12px;">Шрифти</h4>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Шрифт заголовків</label>
+          <select id="selFontHeading" class="form-select">
+            <option value="Cormorant Garamond">Cormorant Garamond (елегантний)</option>
+            <option value="Playfair Display">Playfair Display (преміум)</option>
+            <option value="Montserrat">Montserrat (сучасний)</option>
+            <option value="Roboto Condensed">Roboto Condensed (стриманий)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Шрифт основного тексту</label>
+          <select id="selFontBody" class="form-select">
+            <option value="Plus Jakarta Sans">Plus Jakarta Sans</option>
+            <option value="Inter">Inter</option>
+            <option value="Montserrat">Montserrat</option>
+          </select>
+        </div>
+      </div>
+
+      <h3 style="font-size: 1.4rem; margin-top: 30px; margin-bottom: 6px;">🧩 Модулі сайту</h3>
+      <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 14px;">Увімкніть потрібні секції та задайте їхній порядок на сторінці (стрілками ↑ ↓).</p>
+      <div id="modulesContainer"></div>
+    </div>
+
+    <!-- TAB 3: SERVICES (PRODUCTS) -->
     <div class="tab-content" id="tabServices">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
         <h3 style="font-size: 1.5rem;">🛍 Каталог Послуг (Товарів)</h3>
@@ -466,6 +503,166 @@
 
     let siteConfig = { ...DEFAULT_CONFIG };
 
+    // ===== ПРЕСЕТИ ТЕМ =====
+    const THEME_PRESETS = {
+      flora: { name: '🌸 Flora', colors: {
+        bgIvory: '#FAF6F3', bgWarm: '#FFFBF9', bgBlush: '#F7EBEF',
+        accentLight: '#F4D8E1', accentSoft: '#E8B4C3', accentMedium: '#D9899E',
+        accentDeep: '#C25975', accentDark: '#8F2D46',
+        textMain: '#2E1F23', textBody: '#59474B', textMuted: '#8C787C'
+      }, fontHeading: 'Cormorant Garamond', fontBody: 'Plus Jakarta Sans' },
+      builder: { name: '🏗 Будівництво', colors: {
+        bgIvory: '#F7F6F3', bgWarm: '#F0EEE9', bgBlush: '#FBEFE3',
+        accentLight: '#FFE8D1', accentSoft: '#FFD5AE', accentMedium: '#F0A45B',
+        accentDeep: '#D97B29', accentDark: '#8F4A12',
+        textMain: '#22252A', textBody: '#44484F', textMuted: '#7A7F87'
+      }, fontHeading: 'Roboto Condensed', fontBody: 'Inter' },
+      estate: { name: '🏡 Нерухомість', colors: {
+        bgIvory: '#F8F7F4', bgWarm: '#F2F0EA', bgBlush: '#F4EDDD',
+        accentLight: '#EDDFC2', accentSoft: '#DEC68E', accentMedium: '#C6A352',
+        accentDeep: '#A07F30', accentDark: '#66501A',
+        textMain: '#1E2430', textBody: '#3C4453', textMuted: '#767E8C'
+      }, fontHeading: 'Playfair Display', fontBody: 'Montserrat' },
+      service: { name: '🔧 Послуги', colors: {
+        bgIvory: '#F6F8FB', bgWarm: '#EFF3F9', bgBlush: '#EAF1FC',
+        accentLight: '#DBEAFE', accentSoft: '#BFDBFE', accentMedium: '#60A5FA',
+        accentDeep: '#2563EB', accentDark: '#173E8C',
+        textMain: '#111827', textBody: '#374151', textMuted: '#6B7280'
+      }, fontHeading: 'Montserrat', fontBody: 'Inter' }
+    };
+
+    const COLOR_FIELDS = [
+      { key: 'accentDeep', label: 'Основний акцент' },
+      { key: 'accentDark', label: 'Темний акцент (hover)' },
+      { key: 'bgIvory', label: 'Фон сторінки' },
+      { key: 'bgWarm', label: 'Фон секцій' },
+      { key: 'bgBlush', label: "М'який фон блоків" },
+      { key: 'accentLight', label: 'Світлі рамки' },
+      { key: 'accentSoft', label: "М'які акценти" },
+      { key: 'accentMedium', label: 'Середній акцент' },
+      { key: 'textMain', label: 'Текст заголовків' },
+      { key: 'textBody', label: 'Текст абзаців' },
+      { key: 'textMuted', label: 'Другорядний текст' }
+    ];
+
+    const MODULE_LIST = [
+      { id: 'hero', label: '🏠 Головний екран (Hero)', locked: true },
+      { id: 'about', label: '👤 Про мене / Про компанію' },
+      { id: 'services', label: '🛍 Послуги / Пропозиції' },
+      { id: 'portfolio', label: '🖼 Галерея / Портфоліо' },
+      { id: 'reviews', label: '💬 Відгуки клієнтів' },
+      { id: 'faq', label: '❓ Поширені питання' },
+      { id: 'contact', label: '📞 Контакти та форма заявки', locked: true }
+    ];
+
+    let designState = null;
+    let modulesState = [];
+
+    function initDesignTab() {
+      // Стан теми з конфігу або дефолт flora
+      designState = Object.assign({}, THEME_PRESETS.flora.colors);
+      if (siteConfig.theme) {
+        Object.keys(designState).forEach(function(k) {
+          if (siteConfig.theme[k]) designState[k] = siteConfig.theme[k];
+        });
+      }
+
+      // Кнопки пресетів
+      const pb = document.getElementById('presetButtons');
+      if (pb && !pb.dataset.built) {
+        pb.innerHTML = Object.keys(THEME_PRESETS).map(function(key) {
+          return '<button type="button" class="btn btn-outline btn-sm" onclick="applyPreset(\'' + key + '\')">' + THEME_PRESETS[key].name + '</button>';
+        }).join('');
+        pb.dataset.built = '1';
+      }
+
+      // Інпути кольорів (один раз)
+      const ci = document.getElementById('colorInputs');
+      if (ci && !ci.dataset.built) {
+        ci.innerHTML = COLOR_FIELDS.map(function(f) {
+          return '<div class="form-group"><label class="form-label">' + f.label + '</label>' +
+            '<input type="color" id="col_' + f.key + '" class="form-input" style="height:46px; padding:4px; cursor:pointer;"></div>';
+        }).join('');
+        ci.dataset.built = '1';
+      }
+
+      fillDesignForm();
+
+      // Модулі
+      const savedOrder = Array.isArray(siteConfig.modules) && siteConfig.modules.length ? siteConfig.modules : MODULE_LIST.map(function(m){return m.id;});
+      modulesState = [];
+      MODULE_LIST.forEach(function(m) {
+        modulesState.push({ id: m.id, enabled: savedOrder.includes(m.id), locked: !!m.locked });
+      });
+      // Сортуємо за збереженим порядком
+      modulesState.sort(function(a, b) {
+        return savedOrder.indexOf(a.id) - savedOrder.indexOf(b.id);
+      });
+      renderModulesTab();
+    }
+
+    function fillDesignForm() {
+      COLOR_FIELDS.forEach(function(f) {
+        const inp = document.getElementById('col_' + f.key);
+        if (inp && designState[f.key]) inp.value = designState[f.key];
+      });
+      const fh = document.getElementById('selFontHeading');
+      const fb = document.getElementById('selFontBody');
+      if (fh && siteConfig.theme && siteConfig.theme.fontHeading) fh.value = siteConfig.theme.fontHeading;
+      if (fb && siteConfig.theme && siteConfig.theme.fontBody) fb.value = siteConfig.theme.fontBody;
+    }
+
+    function applyPreset(key) {
+      const p = THEME_PRESETS[key];
+      if (!p) return;
+      COLOR_FIELDS.forEach(function(f) { designState[f.key] = p.colors[f.key]; });
+      fillDesignForm();
+      const fh = document.getElementById('selFontHeading');
+      const fb = document.getElementById('selFontBody');
+      if (fh) fh.value = p.fontHeading;
+      if (fb) fb.value = p.fontBody;
+    }
+
+    function collectDesignState() {
+      COLOR_FIELDS.forEach(function(f) {
+        const inp = document.getElementById('col_' + f.key);
+        if (inp) designState[f.key] = inp.value;
+      });
+      const fh = document.getElementById('selFontHeading');
+      const fb = document.getElementById('selFontBody');
+      if (fh) designState.fontHeading = fh.value;
+      if (fb) designState.fontBody = fb.value;
+      return designState;
+    }
+
+    function renderModulesTab() {
+      const container = document.getElementById('modulesContainer');
+      if (!container) return;
+      container.innerHTML = modulesState.map(function(m, i) {
+        const meta = MODULE_LIST.find(function(x) { return x.id === m.id; }) || {};
+        const lockNote = m.locked ? ' <span style="font-size:0.75rem;color:var(--text-muted);">(обов\u2019язковий)</span>' : '';
+        return '<div class="card-item" style="display:flex; align-items:center; gap:12px; margin-bottom:10px; padding:14px 16px;">' +
+          '<input type="checkbox" ' + (m.enabled ? 'checked' : '') + (m.locked ? ' disabled' : '') + ' onchange="modulesState[' + i + '].enabled=this.checked" style="width:20px; height:20px; cursor:pointer;' + (m.locked ? ' opacity:0.5;' : '') + '">' +
+          '<span style="flex:1; font-weight:500;">' + (meta.label || m.id) + lockNote + '</span>' +
+          '<button type="button" class="btn btn-outline btn-sm" onclick="moveModule(' + i + ',-1)" style="min-width:40px;" title="Вище">↑</button>' +
+          '<button type="button" class="btn btn-outline btn-sm" onclick="moveModule(' + i + ',1)" style="min-width:40px;" title="Нижче">↓</button>' +
+          '</div>';
+      }).join('');
+    }
+
+    function moveModule(i, dir) {
+      const j = i + dir;
+      if (j < 0 || j >= modulesState.length) return;
+      const tmp = modulesState[i];
+      modulesState[i] = modulesState[j];
+      modulesState[j] = tmp;
+      renderModulesTab();
+    }
+
+    function collectEnabledModules() {
+      return modulesState.filter(function(m) { return m.enabled; }).map(function(m) { return m.id; });
+    }
+
     async function loadConfig() {
       // 1. Спершу читаємо актуальні дані з GitHub (site-data.json) — щоб бачити опублікований стан
       try {
@@ -541,6 +738,8 @@
       const aboutPrev = document.getElementById('aboutPhotoPreview');
       if (heroPrev) heroPrev.src = siteConfig.heroPhoto || '';
       if (aboutPrev) aboutPrev.src = siteConfig.aboutPhoto || '';
+
+      initDesignTab();
 
       renderServicesTab();
       renderPhotosTab();
@@ -973,6 +1172,12 @@
       siteConfig.heroSubtitle = document.getElementById('cfgHeroSubtitle').value.trim();
       siteConfig.aboutTitle = document.getElementById('cfgAboutTitle').value.trim();
       siteConfig.aboutLead = document.getElementById('cfgAboutLead').value.trim();
+
+      // Тема та модулі (вкладка Дизайн & Модулі)
+      siteConfig.theme = collectDesignState();
+      siteConfig.modules = collectEnabledModules();
+      if (!siteConfig.modules.includes('hero')) siteConfig.modules.unshift('hero');
+      if (!siteConfig.modules.includes('contact')) siteConfig.modules.push('contact');
 
       localStorage.setItem('karina_admin_config', JSON.stringify(siteConfig));
       setPublishStatus('⏳ Зберігаю... публікую зміни на сайт...', 'wait');
