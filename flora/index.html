@@ -831,6 +831,9 @@
       telegramToken: '',
       telegramChatId: '',
       telegramUsername: 'karinka_flowers',
+      siteTitle: 'Karina Flowers — Авторські Майстер-Класи з Флористики, Весільний Декор та WOW-Букети | Київ',
+      logoText: 'Karinka Flowers',
+      favicon: '',
       phone: '+38 (097) 123-45-67',
       email: 'karina.flowers@gmail.com',
       viberPhone: '+380971234567',
@@ -885,6 +888,28 @@
     }
 
     function applyConfigToDOM() {
+      // Бренд: назва сайту, лого, іконка
+      if (siteConfig.siteTitle) document.title = siteConfig.siteTitle;
+      if (siteConfig.logoText) {
+        const logo = document.querySelector('.logo');
+        if (logo) {
+          const parts = (siteConfig.logoText || '').trim().split(' ');
+          logo.innerHTML = parts.length > 1
+            ? parts[0] + ' <span>' + parts.slice(1).join(' ') + '</span>'
+            : siteConfig.logoText;
+        }
+      }
+      if (siteConfig.favicon) {
+        let favLink = document.querySelector('link[rel="icon"]');
+        if (!favLink) {
+          favLink = document.createElement('link');
+          favLink.rel = 'icon';
+          document.head.appendChild(favLink);
+        }
+        favLink.href = siteConfig.favicon;
+        favLink.type = siteConfig.favicon.startsWith('data:image/png') ? 'image/png' : 'image/jpeg';
+      }
+
       // Phone
       if (siteConfig.phone) {
         const clean = siteConfig.phone.replace(/[^0-9+]/g, '');

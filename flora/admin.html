@@ -277,6 +277,27 @@
       <div class="form-group">
         <label class="form-label"><input type="checkbox" id="cfgViberEnabled"> Показувати фіолетову кнопку Viber на сайті</label>
       </div>
+      <h3 style="font-size: 1.4rem; margin-top: 10px; margin-bottom: 16px;">🏷 Бренд сайту</h3>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Назва сайту (вкладка браузера)</label>
+          <input type="text" id="cfgSiteTitle" class="form-input" placeholder="Karina Flowers — ...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Логотип (текст у шапці)</label>
+          <input type="text" id="cfgLogoText" class="form-input" placeholder="Karinka Flowers">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Іконка сайту (favicon, квадратна)</label>
+        <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+          <img id="faviconPreview" src="favicon.jpg" style="width:48px; height:48px; object-fit:cover; border-radius:8px; border:1px solid var(--rose-light);">
+          <label class="btn btn-outline btn-sm" style="cursor:pointer;">
+            📷 Замінити іконку
+            <input type="file" accept="image/*" style="display:none;" onchange="uploadFavicon(this)">
+          </label>
+        </div>
+      </div>
       <h3 style="font-size: 1.4rem; margin-top: 10px; margin-bottom: 16px;">Контакти на сайті</h3>
       <div class="grid-2">
         <div class="form-group">
@@ -424,6 +445,9 @@
       telegramToken: '',
       telegramChatId: '',
       telegramUsername: 'karinka_flowers',
+      siteTitle: 'Karina Flowers — Авторські Майстер-Класи з Флористики, Весільний Декор та WOW-Букети | Київ',
+      logoText: 'Karinka Flowers',
+      favicon: '',
       phone: '+38 (097) 123-45-67',
       email: 'karina.flowers@gmail.com',
       viberPhone: '+380971234567',
@@ -494,6 +518,10 @@
       document.getElementById('cfgTelegramToken').value = siteConfig.telegramToken || '';
       document.getElementById('cfgTelegramChatId').value = siteConfig.telegramChatId || '';
       document.getElementById('cfgTelegramUsername').value = siteConfig.telegramUsername || '';
+      document.getElementById('cfgSiteTitle').value = siteConfig.siteTitle || '';
+      document.getElementById('cfgLogoText').value = siteConfig.logoText || '';
+      const favPrev = document.getElementById('faviconPreview');
+      if (favPrev && siteConfig.favicon) favPrev.src = siteConfig.favicon;
       document.getElementById('cfgViberPhone').value = siteConfig.viberPhone || '';
       document.getElementById('cfgViberEnabled').checked = siteConfig.viberEnabled !== false;
       document.getElementById('cfgPhone').value = siteConfig.phone || '';
@@ -538,6 +566,27 @@
           alert('Фото "Про мене" оновлено! Натисніть "Зберегти та Застосувати", щоб опублікувати.');
         });
       }
+    }
+
+    function uploadFavicon(inputElem) {
+      if (!inputElem.files || !inputElem.files[0]) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          canvas.width = 128; canvas.height = 128;
+          const ctx = canvas.getContext('2d');
+          // Кроп по центру (квадрат)
+          const side = Math.min(img.width, img.height);
+          ctx.drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, 0, 0, 128, 128);
+          siteConfig.favicon = canvas.toDataURL('image/jpeg', 0.9);
+          document.getElementById('faviconPreview').src = siteConfig.favicon;
+          alert('Іконка сайту оновлена! Натисніть "Зберегти та Застосувати", щоб опублікувати.');
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(inputElem.files[0]);
     }
 
     function switchTab(tabId, btnElem) {
@@ -893,6 +942,11 @@
           if (url) reviews[i].avatar = url;
         }
       }
+      // Favicon
+      if (siteConfig.favicon && siteConfig.favicon.startsWith('data:image/')) {
+        const url = await githubUploadImage(gh, siteConfig.favicon, 'favicon_' + Date.now() + '.jpg');
+        if (url) siteConfig.favicon = url;
+      }
     }
 
     function setPublishStatus(text, type) {
@@ -909,6 +963,8 @@
       siteConfig.telegramToken = document.getElementById('cfgTelegramToken').value.trim();
       siteConfig.telegramChatId = document.getElementById('cfgTelegramChatId').value.trim();
       siteConfig.telegramUsername = document.getElementById('cfgTelegramUsername').value.trim();
+      siteConfig.siteTitle = document.getElementById('cfgSiteTitle').value.trim();
+      siteConfig.logoText = document.getElementById('cfgLogoText').value.trim();
       siteConfig.viberPhone = document.getElementById('cfgViberPhone').value.trim();
       siteConfig.viberEnabled = document.getElementById('cfgViberEnabled').checked;
       siteConfig.phone = document.getElementById('cfgPhone').value.trim();
